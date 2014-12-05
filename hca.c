@@ -53,9 +53,20 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 	if(fp==NULL)perror("Error opening file.");
 	else
 	{
+		int i,j;
+		for(i=0;i<v;i++)
+		{
+			for(j=0;j<=v;j++)
+			{
+				*(g+i*v+j)=0;
+			}
+		}
 		while(!feof(fp))
 		{
-			fgets(temp,100,fp);
+			if(fgets(temp,100,fp)==NULL)
+			{
+				break;
+			}
 			char *tt,*ss;
 			tt=strtok(temp," ");
 			if(strcmp(tt,"e")==0)
@@ -65,16 +76,8 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 				int t=atoi(tt);
 				int s=atoi(ss);
 				printf("t=%d s=%d\n",t,s);
-				*(g+t*v+s)=1;//bug in here?
-				
-			}
-		}
-		int i,j;
-		for(i=0;i<v;i++)
-		{
-			for(j=0;j<v;j++)
-			{
-				printf("g[%d][%d]=%d\n",i,j,*(g+i*v+j));
+				*(g+t*v+s)=1;
+				printf("g[%d][%d]=%d\n",t,s,*(g+t*v+s));
 			}
 		}
 		fclose(fp);
@@ -106,9 +109,8 @@ int main(int argc,char *argv[])
 
     //printf("%d %d %d %s %d\n",n,r,lsl,ptr,k);
     int v=fileProcessing1(ptr);//get vertices number
-    int *g=(int*)malloc(sizeof(int)*v*(v+1));
+    int *g=(int*)malloc(sizeof(int)*(v+1)*(v+2));
     fileProcessing2(g,v,ptr);//get graph (matrix)
-	printf("fileProcessing2 successful!\n");
     int *p;//n population, v = chromosome_length = vertices_number
     while(r>0)//repeat r times
     {
