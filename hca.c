@@ -4,20 +4,96 @@
 #include<time.h>
 void printResult(int *p,int v)
 {}
-bool condition(int *p,int v)
-{}
-void greedySearch(int *p,int *g,int v,int random)
-{
-	
-}
-void selectParents(int *p,int *g,int v,int *p1,int *p2)
-{}
-void crossover(int *g,int *p1,int *p2,int *c1,int *c2)
-{}
 void localSearch(int *p,int *g,int *c)
 {}
-void updatePopulation(int *p,int v,int *c1,int *c2)
-{}
+void paste(int *p,int p1,int *c1,int v)
+{
+	int i;
+	for(i=0;i<=v;i++)
+	{
+		*(p+p1*v+i)=*(c1+i);
+	}
+}
+void updatePopulation(int *p,int p1,int p2,int *c1,int *c2,int v)
+{
+	if((*c1)>(*(p+p1*v)))
+	{
+		paste(p,p1,c1,v);
+		if((*c2)>(*(p+p2*v)))
+		{
+			paste(p,p2,c2,v);
+		}
+	}
+	else if((*c2)>(*(p+p1*v)))
+	{
+		paste(p,p1,c2,v);
+		if((*c1)>(*(p+p2*v)))
+		{
+			paste(p,p2,c1,v);
+		}
+	}
+	else;
+}
+void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v)
+{
+	int i,r;
+	srand(time(NULL));
+	for(i=1;i<=v;i++)
+	{
+		r=rand()%2;
+		if(r==0)
+		{
+			*(c1+i)=*(p+p1*v+i);
+			*(c2+i)=*(p+p2*v+i);
+		}
+		else
+		{
+			*(c1+i)=*(p+p2*v+i);
+			*(c2+i)=*(p+p1*v+i);
+		}
+	}
+	*(c1)=fitness(g,c1,v,0);
+	*(c2)=fitness(g,c2,v,0);
+}
+void randomSelectParents(int n,int *p1,int *p2)
+{
+	srand(time(NULL));
+	*p1=rand()%n;
+	*p2=rand()%n;
+	while(*p1==*p2)
+	{
+		*p2=rand()%n;
+	}
+}
+int fitness(int *g,int *p,int v,int n)
+{
+	int i,j;
+	int f=0;
+	for(i=1;i<=v;i++)
+	{
+		for(j=2;j<=v;j++)
+		{
+			if(i==j)continue;
+			if((*(g+i*v+j)==1)&&(*(p+n*v+i)==*(p+n*v+j)))
+			{
+				f++;
+				break;
+			}
+		}
+	}
+	return(f);
+}
+int condition(int *p,int v,int n)
+{
+	int i;
+	for(i=0;i<n;i++)
+	{
+		if(*(p+i*v)==0)
+		{
+			return(0);
+		}
+	}
+}
 int fileProcessing1(char *ptr)//get v
 {
 	FILE *fp;
@@ -95,6 +171,19 @@ int find_degree(int *g,int v,int l)
 	}
 	return(degree);
 }
+void printPopulation(int *p,int n,int v)
+{
+	int i,j;
+	for(i=0;i<n;i++)
+	{
+		for(j=0;j<=v;j++)
+		{
+			printf("%d",*(p+i*v+j));
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
 void init(int *p,int *g,int n,int v,int k)//do greedy search
 {
     int i,j,l,m;
@@ -169,13 +258,9 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 			}
 			record[r]=1;
 		}
-		
-		for(j=1;j<=v;j++)
-		{
-			printf("%d",*(p+i*v+j));
-		}
-		printf("\n");		
+		*(p+i*v)=fitness(g,p,v,i);
     }
+	printPopulation(p,n,v);
 }
 int main(int argc,char *argv[])
 {
@@ -184,32 +269,32 @@ int main(int argc,char *argv[])
         printf("population_size repeat_times localsearch_length file_name chromatic_number\n");
         return(-1);
     }
-    int n=atoi(argv[1]);//population size
-    int repeat=atoi(argv[2]);//repeat times
-    int lsl=atoi(argv[3]);//localsearch length
-    char *ptr=argv[4];//file name
-    int k=atoi(argv[5]);//chromatic number
+    int n=atoi(argv[1]);							//population size
+    int repeat=atoi(argv[2]);						//repeat times
+    int lsl=atoi(argv[3]);							//localsearch length
+    char *ptr=argv[4];								//file name
+    int k=atoi(argv[5]);							//chromatic number
 
-    //printf("%d %d %d %s %d\n",n,r,lsl,ptr,k);
-    int v=fileProcessing1(ptr);//get vertices number
+    int v=fileProcessing1(ptr);						//get vertices number
     int *g=(int*)malloc(sizeof(int)*(v+1)*(v+2));
-    fileProcessing2(g,v,ptr);//get graph (matrix)
-    int *p=(int*)malloc(sizeof(int)*n*(v+1));;//n population, v = chromosome_length = vertices_number
-    while(repeat>0)//repeat r times
+    fileProcessing2(g,v,ptr);						//get graph (matrix)
+    int *p=(int*)malloc(sizeof(int)*n*(v+1));;		//n population, v = chromosome_length = vertices_number
+    while(repeat>0)									//repeat r times
     {
         init(p,g,n,v,k);
-		/*
-        while(condition(p,v)==true)
+		
+        while(condition(p,v,n)==1)
         {
-            int p1[v],p2[v],c1[v],c2[v];
-            selectParents(p,g,v,p1,p2);
-            crossover(g,p1,p2,c1,c2);
-            localSearch(p,g,c1);
-            localSearch(p,g,c2);
-            updatePopulation(p,v,c1,c2);
+            int p1,p2,c1[v+1],c2[v+1];
+            randomSelectParents(n,&p1,&p2);
+            simpleCrossover(g,p,p1,p2,c1,c2,v);
+            //localSearch(p,g,c1);
+            //localSearch(p,g,c2);
+            updatePopulation(p,p1,p2,c1,c2,v);
+			printPopulation(p,n,v);
         }
         printResult(p,v);//need to implement; 
-		*/
+		
 		repeat--;
     }
     return(0);
