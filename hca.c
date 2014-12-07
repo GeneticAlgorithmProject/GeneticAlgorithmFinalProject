@@ -2,8 +2,6 @@
 #include<stdlib.h>
 #include<string.h>
 #include<time.h>
-void printResult(int *p,int v)
-{}
 void localSearch(int *p,int *g,int *c)
 {}
 void paste(int *p,int p1,int *c1,int v)
@@ -16,23 +14,71 @@ void paste(int *p,int p1,int *c1,int v)
 }
 void updatePopulation(int *p,int p1,int p2,int *c1,int *c2,int v)
 {
-	if((*c1)>(*(p+p1*v)))
+	if((*c1)<(*(p+p1*v)))
 	{
 		paste(p,p1,c1,v);
-		if((*c2)>(*(p+p2*v)))
+		if((*c2)<(*(p+p2*v)))
 		{
 			paste(p,p2,c2,v);
 		}
 	}
-	else if((*c2)>(*(p+p1*v)))
+	else if((*c2)<(*(p+p1*v)))
 	{
 		paste(p,p1,c2,v);
-		if((*c1)>(*(p+p2*v)))
+		if((*c1)<(*(p+p2*v)))
 		{
 			paste(p,p2,c1,v);
 		}
 	}
 	else;
+}
+int getBestFitness(int *p,int v,int n)
+{
+	int i,min=*(p+v);
+	for(i=1;i<n;i++)
+	{
+		if(min>*(p+i*v))
+		{
+			min=*(p+i*v);
+		}
+	}
+	return(min);
+}
+int getAverageFitness(int *p,int v,int n)
+{
+	int i,sum=0;
+	for(i=0;i<n;i++)
+	{
+		sum+=*(p+i*v);
+	}
+	sum/=n;
+	return(sum);
+}
+void printResult(int *p,int v,int n)
+{
+	printf("Avg=%d Best=%d\n",getAverageFitness(p,v,n),getBestFitness(p,v,n));
+}
+void printAverageFitness(int *p,int v,int n)
+{
+	printf("Average Fitness=%d\n",getAverageFitness(p,v,n));
+}
+int fitness(int *g,int *p,int v,int n)
+{
+	int i,j;
+	int f=0;
+	for(i=1;i<=v;i++)
+	{
+		for(j=2;j<=v;j++)
+		{
+			if(i==j)continue;
+			if((*(g+i*v+j)==1)&&(*(p+n*v+i)==*(p+n*v+j)))
+			{
+				f++;
+				break;
+			}
+		}
+	}
+	return(f);
 }
 void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v)
 {
@@ -65,24 +111,6 @@ void randomSelectParents(int n,int *p1,int *p2)
 		*p2=rand()%n;
 	}
 }
-int fitness(int *g,int *p,int v,int n)
-{
-	int i,j;
-	int f=0;
-	for(i=1;i<=v;i++)
-	{
-		for(j=2;j<=v;j++)
-		{
-			if(i==j)continue;
-			if((*(g+i*v+j)==1)&&(*(p+n*v+i)==*(p+n*v+j)))
-			{
-				f++;
-				break;
-			}
-		}
-	}
-	return(f);
-}
 int condition(int *p,int v,int n)
 {
 	int i;
@@ -93,6 +121,7 @@ int condition(int *p,int v,int n)
 			return(0);
 		}
 	}
+	return(1);
 }
 int fileProcessing1(char *ptr)//get v
 {
@@ -291,9 +320,9 @@ int main(int argc,char *argv[])
             //localSearch(p,g,c1);
             //localSearch(p,g,c2);
             updatePopulation(p,p1,p2,c1,c2,v);
-			printPopulation(p,n,v);
+			//printPopulation(p,n,v);
+			printResult(p,v,n);
         }
-        printResult(p,v);//need to implement; 
 		
 		repeat--;
     }
