@@ -11,23 +11,23 @@ void paste(int *p,int p1,int *c1,int v)
 	int i;
 	for(i=0;i<=v;i++)
 	{
-		*(p+p1*v+i)=*(c1+i);
+		*(p+p1*(v+1)+i)=*(c1+i);
 	}
 }
 void updatePopulation(int *p,int p1,int p2,int *c1,int *c2,int v)
 {
-	if((*c1)<(*(p+p1*v)))
+	if((*c1)<(*(p+p1*(v+1))))
 	{
 		paste(p,p1,c1,v);
-		if((*c2)<(*(p+p2*v)))
+		if((*c2)<(*(p+p2*(v+1))))
 		{
 			paste(p,p2,c2,v);
 		}
 	}
-	else if((*c2)<(*(p+p1*v)))
+	else if((*c2)<(*(p+p1*(v+1))))
 	{
 		paste(p,p1,c2,v);
-		if((*c1)<(*(p+p2*v)))
+		if((*c1)<(*(p+p2*(v+1))))
 		{
 			paste(p,p2,c1,v);
 		}
@@ -36,14 +36,14 @@ void updatePopulation(int *p,int p1,int p2,int *c1,int *c2,int v)
 }
 int getBestFitness(int *p,int v,int n)
 {
-	int i,min=*(p+v);
+	int i,min=*p;
 	int who=0;
 	for(i=1;i<n;i++)
 	{
-		if(min>*(p+i*v))
+		if(min>*(p+i*(v+1)))
 		{
-			min=*(p+i*v);
-			who=1;
+			min=*(p+i*(v+1));
+			who=i;
 		}
 	}
 	return(who);
@@ -54,18 +54,19 @@ double getAverageFitness(int *p,int v,int n)
 	double sum=0.0;
 	for(i=0;i<n;i++)
 	{
-		sum+=(double)*(p+i*v);
+		sum+=(double)*(p+i*(v+1));
 	}
 	sum/=n;
 	return(sum);
 }
 void printResult(int *p,int v,int n)
 {
-	printf("Avg=%lf Best=%d ",getAverageFitness(p,v,n),*(p+getBestFitness(p,v,n)*v));
+	int best=getBestFitness(p,v,n);
+	printf("Avg=%lf Best=%d ",getAverageFitness(p,v,n),*(p+best*(v+1)));
 	int i;
-	for(i=1;i<=v;i++)
+	for(i=0;i<=v;i++)
 	{
-		printf("%d",*(p+getBestFitness(p,v,n)*v+i));
+		printf("%d",*(p+best*(v+1)+i));
 	}
 	printf("\n");
 }
@@ -73,16 +74,16 @@ void printAverageFitness(int *p,int v,int n)
 {
 	printf("Average Fitness=%lf\n",getAverageFitness(p,v,n));
 }
-int fitness(int *g,int *p,int v,int n)
+int fitness(int *g,int *p,int v,int x)
 {
 	int i,j;
 	int f=0;
-	for(i=1;i<v;i++)
+	for(i=1;i<=v;i++)
 	{
-		for(j=2;j<v;j++)
+		for(j=1;j<=v;j++)
 		{
 			if(i==j)continue;
-			if((*(g+i*v+j)==1)&&(*(p+n*v+i)==*(p+n*v+j)))
+			if((*(g+i*(v+1)+j)==1)&&(*(p+x*(v+1)+i)==*(p+x*(v+1)+j)))
 			{
 				f++;
 				break;
@@ -95,18 +96,18 @@ void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v)
 {
 	int i,r;
 	srand(time(NULL));
-	for(i=1;i<v;i++)
+	for(i=1;i<=v;i++)
 	{
 		r=rand()%2;
 		if(r==0)
 		{
-			*(c1+i)=*(p+p1*v+i);
-			*(c2+i)=*(p+p2*v+i);
+			*(c1+i)=*(p+p1*(v+1)+i);
+			*(c2+i)=*(p+p2*(v+1)+i);
 		}
 		else
 		{
-			*(c1+i)=*(p+p2*v+i);
-			*(c2+i)=*(p+p1*v+i);
+			*(c1+i)=*(p+p2*(v+1)+i);
+			*(c2+i)=*(p+p1*(v+1)+i);
 		}
 	}
 	*(c1)=fitness(g,c1,v,0);
@@ -127,7 +128,7 @@ int condition(int *p,int v,int n)
 	int i;
 	for(i=0;i<n;i++)
 	{
-		if(*(p+i*v)==0)
+		if(*(p+i*(v+1))==0)
 		{
 			return(0);
 		}
@@ -174,10 +175,10 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 		int i,j;
 		for(i=0;i<=v;i++)
 		{
-			*(g+i*v)=v;
+			*(g+i*(v+1))=v;
 			for(j=1;j<=v;j++)
 			{
-				*(g+i*v+j)=0;
+				*(g+i*(v+1)+j)=0;
 			}
 		}
 		while(!feof(fp))
@@ -195,7 +196,7 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 				int t=atoi(tt);
 				int s=atoi(ss);
 				//printf("t=%d s=%d\n",t,s);
-				*(g+t*v+s)=1;
+				*(g+t*(v+1)+s)=1;
 				//printf("g[%d][%d]=%d\n",t,s,*(g+t*v+s));
 			}
 		}
@@ -258,9 +259,9 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 		for(l=1;l<=v;l++)
 		{
 			record[l]=0;
-			*(p+i*v+l)=0;
+			*(p+i*(v+1)+l)=0;
 		}
-		*(p+i*v+max_who)=1;//the vertex with max degree color 1
+		*(p+i*(v+1)+max_who)=1;//the vertex with max degree color 1
 		record[max_who]=1;
 		for(j=1;j<v;j++)
 		{
@@ -279,13 +280,13 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 			//check the neighbor adjacent to this vertex if colored
 			for(m=1;m<=v;m++)
 			{
-				if((*(g+r*v+m)==1)&&(record[m]==1))//adjacent and colored neighbor
+				if((*(g+r*(v+1)+m)==1)&&(record[m]==1))//adjacent and colored neighbor
 				{
-					color[(*(p+i*v+m))]=1;
+					color[(*(p+i*(v+1)+m))]=1;
 				}
-				else if(*(g+r*v+m)==0)//not adjacent 
+				else if(*(g+r*(v+1)+m)==0)//not adjacent 
 				{
-					color[(*(p+i*v+m))]=-1;//ignore
+					color[(*(p+i*(v+1)+m))]=-1;//ignore
 				}
 				else;//adjacent but not colored keep 0
 			}
@@ -295,7 +296,7 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 			{
 				if(color[m]==0)//this color is not appeared in neighbor
 				{
-					*(p+i*v+r)=m;
+					*(p+i*(v+1)+r)=m;
 					flag=1;
 					break;
 				}
@@ -303,11 +304,11 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 			if(flag==0)//color is exhausted
 			{
 				random=rand()%k+1;
-				*(p+i*v+r)=random;
+				*(p+i*(v+1)+r)=random;
 			}
 			record[r]=1;
 		}
-		*(p+i*v)=fitness(g,p,v,i);
+		*(p+i*(v+1))=fitness(g,p,v,i);
     }
 	printPopulation(p,n,v);
 }
@@ -331,7 +332,6 @@ int main(int argc,char *argv[])
     while(repeat>0)									//repeat r times
     {
         init(p,g,n,v,k);
-		
         while(condition(p,v,n)==1)
         {
             int p1,p2,c1[v],c2[v];
