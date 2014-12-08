@@ -3,7 +3,9 @@
 #include<string.h>
 #include<time.h>
 void localSearch(int *p,int *g,int *c)
-{}
+{
+
+}
 void paste(int *p,int p1,int *c1,int v)
 {
 	int i;
@@ -35,40 +37,49 @@ void updatePopulation(int *p,int p1,int p2,int *c1,int *c2,int v)
 int getBestFitness(int *p,int v,int n)
 {
 	int i,min=*(p+v);
+	int who=0;
 	for(i=1;i<n;i++)
 	{
 		if(min>*(p+i*v))
 		{
 			min=*(p+i*v);
+			who=1;
 		}
 	}
-	return(min);
+	return(who);
 }
-int getAverageFitness(int *p,int v,int n)
+double getAverageFitness(int *p,int v,int n)
 {
-	int i,sum=0;
+	int i;
+	double sum=0.0;
 	for(i=0;i<n;i++)
 	{
-		sum+=*(p+i*v);
+		sum+=(double)*(p+i*v);
 	}
 	sum/=n;
 	return(sum);
 }
 void printResult(int *p,int v,int n)
 {
-	printf("Avg=%d Best=%d\n",getAverageFitness(p,v,n),getBestFitness(p,v,n));
+	printf("Avg=%lf Best=%d ",getAverageFitness(p,v,n),*(p+getBestFitness(p,v,n)*v));
+	int i;
+	for(i=1;i<=v;i++)
+	{
+		printf("%d",*(p+getBestFitness(p,v,n)*v+i));
+	}
+	printf("\n");
 }
 void printAverageFitness(int *p,int v,int n)
 {
-	printf("Average Fitness=%d\n",getAverageFitness(p,v,n));
+	printf("Average Fitness=%lf\n",getAverageFitness(p,v,n));
 }
 int fitness(int *g,int *p,int v,int n)
 {
 	int i,j;
 	int f=0;
-	for(i=1;i<=v;i++)
+	for(i=1;i<v;i++)
 	{
-		for(j=2;j<=v;j++)
+		for(j=2;j<v;j++)
 		{
 			if(i==j)continue;
 			if((*(g+i*v+j)==1)&&(*(p+n*v+i)==*(p+n*v+j)))
@@ -84,7 +95,7 @@ void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v)
 {
 	int i,r;
 	srand(time(NULL));
-	for(i=1;i<=v;i++)
+	for(i=1;i<v;i++)
 	{
 		r=rand()%2;
 		if(r==0)
@@ -161,9 +172,10 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 	else
 	{
 		int i,j;
-		for(i=0;i<v;i++)
+		for(i=0;i<=v;i++)
 		{
-			for(j=0;j<=v;j++)
+			*(g+i*v)=v;
+			for(j=1;j<=v;j++)
 			{
 				*(g+i*v+j)=0;
 			}
@@ -190,15 +202,31 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 		fclose(fp);
 	}
 }
-int find_degree(int *g,int v,int l)
+int findDegree(int *g,int v,int l)
 {
 	int i;
 	int degree=0;
 	for(i=1;i<=v;i++)
 	{
-		degree+=*(g+l*v+i);
+		degree+=*(g+l*(v+1)+i);
 	}
 	return(degree);
+}
+int findMaxDegree(int *g,int v,int *who)
+{
+	int i;
+	int degree;
+	int	max_degree=findDegree(g,v,*who);
+	for(i=1;i<=v;i++)
+	{
+		degree=findDegree(g,v,i);
+		if(max_degree<degree)
+		{
+			max_degree=degree;
+			*who=i;
+		}
+	}
+	return(max_degree);
 }
 void printPopulation(int *p,int n,int v)
 {
@@ -217,18 +245,10 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 {
     int i,j,l,m;
 	srand(time(NULL));
-	int degree[v+1];
 	int max_degree=0;
 	int max_who=0;
-	for(l=1;l<=v;l++)
-	{
-		degree[l]=find_degree(g,v,l);
-		if(max_degree<degree[l])
-		{
-			max_degree=degree[l];
-			max_who=l;
-		}
-	}
+	max_degree=findMaxDegree(g,v,&max_who);
+	
     for(i=0;i<n;i++)
     {
         //srand(time(NULL));
@@ -305,7 +325,7 @@ int main(int argc,char *argv[])
     int k=atoi(argv[5]);							//chromatic number
 
     int v=fileProcessing1(ptr);						//get vertices number
-    int *g=(int*)malloc(sizeof(int)*(v+1)*(v+2));
+    int *g=(int*)malloc(sizeof(int)*(v+1)*(v+1));
     fileProcessing2(g,v,ptr);						//get graph (matrix)
     int *p=(int*)malloc(sizeof(int)*n*(v+1));;		//n population, v = chromosome_length = vertices_number
     while(repeat>0)									//repeat r times
@@ -314,7 +334,7 @@ int main(int argc,char *argv[])
 		
         while(condition(p,v,n)==1)
         {
-            int p1,p2,c1[v+1],c2[v+1];
+            int p1,p2,c1[v],c2[v];
             randomSelectParents(n,&p1,&p2);
             simpleCrossover(g,p,p1,p2,c1,c2,v);
             //localSearch(p,g,c1);
@@ -323,7 +343,6 @@ int main(int argc,char *argv[])
 			//printPopulation(p,n,v);
 			printResult(p,v,n);
         }
-		
 		repeat--;
     }
     return(0);
