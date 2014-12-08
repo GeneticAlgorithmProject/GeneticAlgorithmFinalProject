@@ -167,7 +167,7 @@ int fileProcessing1(char *ptr)//get v
     }
     else
     {
-        if(!feof(fp))
+        while(!feof(fp))
         {
             if((fgets(temp,100,fp)!=NULL)&&(strcmp(temp,"p")==1))
             {
@@ -177,7 +177,6 @@ int fileProcessing1(char *ptr)//get v
                 if(strcmp(tt,"edge")==1)
                 {
                     //???
-                    return 0;
                 }
                 else
                 {
@@ -186,12 +185,7 @@ int fileProcessing1(char *ptr)//get v
                     return(atoi(tt));
                 }
             }
-            else {
-                return 0;
-            }
         }
-        else
-            return 0;
     }
 }
 void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
