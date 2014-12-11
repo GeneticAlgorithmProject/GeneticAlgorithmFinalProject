@@ -144,6 +144,38 @@ void randomSelectParents(int n,int *p1,int *p2)
         *p2=rand()%n;
     }
 }
+void uniformArray(int *array,int a,int b)
+{
+	srand(time(NULL));
+	int* base = (int*)malloc(sizeof(int)*(b-a+1));
+	int i,j;
+	for(i=0;i<b-a+1;i++)
+		base[i]=a+i;
+	for(i=0;i<b-a+1;i++){
+		j=rand()%(b-a+1-i);
+		array[i] = base[j];
+		base[j] = base[b-a-i];
+	}
+}
+void tournamentSelection(int* p,int v,int* pool,s,n,int *p1,int *p2)
+{
+		int randomarray[2][n];
+		int i;
+		for(i=0;i<2;i++)
+			uniformArray(randomarray[i],0,n-1);
+		for(i=0;i<n;i++){
+			int winner = randomarray[0][i];
+			int WinnderFitness =  *(p+winner*(v+1));
+			
+			int challenger = randomarray[1][i];
+			int ChallengerFitness = *(p+challenger*(v+1));
+			if(ChallengerFitness > WinnderFitness){
+				winner = challenger;
+				WinnderFitness = ChallengerFitness;
+			}
+			*(pool+i) = winner;
+		}
+}
 int condition(int *p,int v,int n)
 {
     int i;
@@ -292,8 +324,8 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
             for(m=1;m<=k;m++)
             {
                 color[m]=0;
-            }
             //random select a vertex to color
+            }
             int r;
             r=rand()%v+1;
             while(record[r]==1)
@@ -338,9 +370,9 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 }
 int main(int argc,char *argv[])
 {
-    if(argc!=6)
+    if(argc!=7)
     {
-        printf("population_size repeat_times localsearch_length file_name chromatic_number\n");
+        printf("population_size repeat_times localsearch_length file_name chromatic_number  selectionPressure\n");
         return(-1);
     }
     int n=atoi(argv[1]);							//population size
@@ -348,11 +380,13 @@ int main(int argc,char *argv[])
     int lsl=atoi(argv[3]);							//localsearch length
     char *ptr=argv[4];								//file name
     int k=atoi(argv[5]);							//chromatic number
-    
+    int s=atoi(argv[6]);							//selectionPressure
+	
     int v=fileProcessing1(ptr);						//get vertices number
     int *g=(int*)malloc(sizeof(int)*(v+1)*(v+1));
     fileProcessing2(g,v,ptr);						//get graph (matrix)
     int *p=(int*)malloc(sizeof(int)*n*(v+1));;		//n population, v = chromosome_length = vertices_number
+	int *pool=(int*)malloc(sizeof(int)*n*(v+1));
     while(repeat>0)									//repeat r times
     {
         init(p,g,n,v,k);
@@ -360,6 +394,7 @@ int main(int argc,char *argv[])
         {
             int p1,p2,c1[v],c2[v];
             randomSelectParents(n,&p1,&p2);
+			tournamentSelection(p,v,pool,s,n,&p1,&p2);
             simpleCrossover(g,p,p1,p2,c1,c2,v);
             localSearch(p,g, v, k, c1);
             //localSearch(p,g,c2);
