@@ -315,6 +315,19 @@ int fileProcessing1(char *ptr)//get v
 		}
 	}
 }
+void setDegree(int *g,int v)
+{
+	int i,j;
+	int degree=0;
+	for(i=1;i<=v;i++)
+	{
+		for(j=1;j<=v;j++)
+		{
+			*(g+0*(v+1)+i)+=*(g+i*(v+1)+j);
+			*(g+i*(v+1))+=*(g+i*(v+1)+j);
+		}
+	}
+}
 void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 {
 	FILE *fp;
@@ -326,8 +339,7 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 		int i,j;
 		for(i=0;i<=v;i++)
 		{
-			*(g+i*(v+1))=v;
-			for(j=1;j<=v;j++)
+			for(j=0;j<=v;j++)
 			{
 				*(g+i*(v+1)+j)=0;
 			}
@@ -348,23 +360,24 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 				int s=atoi(ss);
 				//printf("t=%d s=%d\n",t,s);
 				*(g+t*(v+1)+s)=1;
+				*(g+s*(v+1)+t)=1;
 				//printf("g[%d][%d]=%d\n",t,s,*(g+t*v+s));
 			}
 		}
 		fclose(fp);
 	}
-}
-void setDegree(int *g,int v)
-{
+	setDegree(g,v);
+	/*
 	int i,j;
-	int degree=0;
-	for(i=1;i<=v;i++)
+	for(i=0;i<=v;i++)
 	{
-		for(j=1;j<=v;j++)
+		for(j=0;j<=v;j++)
 		{
-			*(g+0*(v+1)+i)+=*(g+i*(v+1)+j);
+			printf("%d ",*(g+i*(v+1)+j));
 		}
+		printf("\n");
 	}
+	*/
 }
 int compare(const void *a,const void *b)
 {
@@ -373,95 +386,105 @@ int compare(const void *a,const void *b)
 int getDegree(int *g,int v,int x,int *who,int *degree)//get x-th max degree index and value
 {
 	int i;
-	int order[v][2];
-	for(i=0;i<v;i++)
+	int order[v+1][2];
+	for(i=1;i<=v;i++)
 	{
 		order[i][0]=*(g+0*(v+1)+i);
 		order[i][1]=i;
 	}
-	qsort(order,v,sizeof(int)*2,compare);
+	qsort(order[1],v,sizeof(int)*2,compare);
 	*degree=order[x][0];
 	*who=order[x][1];
+
+	/*
+	for(i=1;i<=v;i++)
+	{
+		printf("%d %d\n",i,order[i][1]);
+	}
+	printf("over\n");
+	*/
 }
 void printPopulation(int *p,int n,int v)
 {
 	int i,j;
+	printf("Print Population:\n");
 	for(i=0;i<n;i++)
 	{
-		for(j=0;j<=v;j++)
+		printf("%d ",*(p+i*(v+1)));
+		for(j=1;j<=v;j++)
 		{
-			printf("%d %d",i+1,*(p+i*(v+1)+j));
+			printf("%d ",*(p+i*(v+1)+j));
 		}
 		printf("\n");
 	}
+	printf("Print Population over.\n");
 }
 void init(int *p,int *g,int n,int v,int k)//do greedy search
 {
     int i,j,l,m;
-	srand(time(NULL));
+	int colored[v+1];//record colord vertex
+	int init_index[v+1];
+	int init_count=0;
 	int max_degree=0;
 	int max_who=0;
+	srand(time(NULL));
 	getDegree(g,v,1,&max_who,&max_degree);
-	//printf("max=%d degree=%d\n",max_who,max_degree);
-    for(i=0;i<n;i++)
-    {
-        int random;
-		int record[v+1];
-		int color[k+1];
-		for(l=1;l<=v;l++)
-		{
-			record[l]=0;
-			*(p+i*(v+1)+l)=0;
-		}
-		*(p+i*(v+1)+max_who)=1;//the vertex with max degree color 1
-		record[max_who]=1;
-		for(j=1;j<v;j++)
-		{
-			for(m=1;m<=k;m++)
-			{
-				color[m]=0;
-			}
-			//random select a vertex to color
-			int r;
-			r=rand()%v+1;
-			while(record[r]==1)
-			{
-				r=r%v+1;
-			}
-		
-			//check the neighbor adjacent to this vertex if colored
-			for(m=1;m<=v;m++)
-			{
-				if((*(g+r*(v+1)+m)==1)&&(record[m]==1))//adjacent and colored neighbor
-				{
-					color[(*(p+i*(v+1)+m))]=1;
-				}
-				else if(*(g+r*(v+1)+m)==0)//not adjacent 
-				{
-					color[(*(p+i*(v+1)+m))]=-1;//ignore
-				}
-				else;//adjacent but not colored keep 0
-			}
+	init_count++;
+	init_index[init_count]=max_who;
+	colored[max_who]=1;
+	for(j=0;j<n;j++)
+	{
+		*(p+j*(v+1)+init_index[init_count])=init_count;
+	}
 
-			int flag=0;
-			for(m=1;m<=k;m++)
+	for(i=2;i<=v;i++)
+	{
+		getDegree(g,v,i,&max_who,&max_degree);
+		int flag=1;
+		for(j=1;j<=init_count;j++)
+		{	
+			if(*(g+max_who*(v+1)+init_index[j])==0)
 			{
-				if(color[m]==0)//this color is not appeared in neighbor
-				{
-					*(p+i*(v+1)+r)=m;
-					flag=1;
-					break;
-				}
+				flag=0;
+				break;
 			}
-			if(flag==0)//color is exhausted
-			{
-				random=rand()%k+1;
-				*(p+i*(v+1)+r)=random;
-			}
-			record[r]=1;
 		}
+		if(flag==1)
+		{
+			init_count++;
+			init_index[init_count]=max_who;
+			for(j=0;j<n;j++)
+			{
+				*(p+j*(v+1)+max_who)=init_count;
+			}
+			colored[max_who]=1;
+		}
+		//printPopulation(p,n,v);
+		/*
+		for(j=1;j<=init_count;j++)
+		{
+			printf("%d ",init_index[j]);
+		}
+		printf("\n");
+		*/
+	}
+	for(i=1;i<=v;i++)
+	{
+		if(colored[i]==1)
+			continue;
+		else
+		{
+			for(j=0;j<n;j++)
+			{
+				int random=rand()%k+1;
+				*(p+j*(v+1)+i)=random;
+			}
+		}
+	}
+	for(i=0;i<n;i++)
+	{
 		*(p+i*(v+1))=fitness(g,p,v,i);
-    }
+	}
 	//printPopulation(p,n,v);
 }
 int main(int argc,char *argv[])
@@ -482,7 +505,6 @@ int main(int argc,char *argv[])
     int *g=(int*)malloc(sizeof(int)*(v+1)*(v+1));
     fileProcessing2(g,v,ptr);						//get graph (matrix)
     int *p=(int*)malloc(sizeof(int)*n*(v+1));;		//n population, v = chromosome_length = vertices_number
-	setDegree(g,v);
 	int *pool=(int*)malloc(sizeof(int)*n*(v+1));
     while(repeat>0)									//repeat r times
     {
@@ -492,17 +514,16 @@ int main(int argc,char *argv[])
         while(condition(p,v,n)==1)
         {
             int p1,p2,c1[v+1],c2[v+1];
-            tournamentSelection(p,v,pool,s,n);
+            //tournamentSelection(p,v,pool,s,n);
             randomSelectParents(n,&p1,&p2);
             simpleCrossover(g,p,p1,p2,c1,c2,v);
             //localSearch(g,p,v,c1,lsl,k);
             //localSearch(g,p,v,c2,lsl,k);
             updatePopulation(p,p1,p2,c1,c2,v);
 			generation++;
-			printResult(p,v,n,generation);
+			//printResult(p,v,n,generation);
         }
 		printResult(p,v,n,generation);
-		
 		repeat--;
     }
     return(0);
