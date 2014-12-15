@@ -79,9 +79,9 @@ void updatePopulation(int *p,int p1,int p2,int *c1,int *c2,int v)
 }
 int getWorstOne(int *p,int v,int n)
 {
-	int i,max=*p;
-	int who=0;
-	for(i=1;i<n;i++)
+	int i,max=*(p+1*(v+1));
+	int who=1;
+	for(i=2;i<=n;i++)
 	{
 		if(max<*(p+i*(v+1)))
 		{
@@ -93,9 +93,9 @@ int getWorstOne(int *p,int v,int n)
 }
 int getBestOne(int *p,int v,int n)
 {
-	int i,min=*p;
-	int who=0;
-	for(i=1;i<n;i++)
+	int i,min=*(p+1*(v+1));
+	int who=1;
+	for(i=2;i<=n;i++)
 	{
 		if(min>*(p+i*(v+1)))
 		{
@@ -109,7 +109,7 @@ double getAverageFitness(int *p,int v,int n)
 {
 	int i;
 	double sum=0.0;
-	for(i=0;i<n;i++)
+	for(i=1;i<=n;i++)
 	{
 		sum+=(double)*(p+i*(v+1));
 	}
@@ -190,22 +190,22 @@ void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v)
 void randomSelectParents(int n,int *p1,int *p2)
 {
 	srand(time(NULL));
-	*p1=rand()%n;
-	*p2=rand()%n;
+	*p1=rand()%n+1;
+	*p2=rand()%n+1;
 	while(*p1==*p2)
 	{
-		*p2=rand()%n;
+		*p2=rand()%n+1;
 	}
 }
 void uniformArray(int *array,int n)
 {
 	srand(time(NULL));
-	int* base = (int*)malloc(sizeof(int)*(n));
+	int* base = (int*)malloc(sizeof(int)*(n+1));
 	int i,j;
-	for(i=0;i<n;i++)
+	for(i=1;i<=n;i++)
 		base[i]=i;
-	for(i=0;i<n;i++){
-		j=rand()%(n-i);
+	for(i=1;i<=n;i++){
+		j=rand()%(n+1-i);
 		array[i] = base[j];
 		base[j] = base[i];
 	}
@@ -215,15 +215,15 @@ void tournamentSelection(int *p,int v,int *pool,int s,int n)
 {
 	srand(time(NULL));
 	int i,j,m;
-	int array[n];
-	int record[n];
+	int array[n+1];
+	int record[n+1];
 	for(i=0;i<s;i++)
 	{
-		for(j=0;j<n;j++)
+		for(j=1;j<=n;j++)
 		{
 			record[j]=0;
 		}
-		for(j=0;j<n;j++)//random array
+		for(j=1;j<=n;j++)//random array
 		{
 			int s1=rand()%n;
 			while(record[s1]==1)
@@ -233,7 +233,7 @@ void tournamentSelection(int *p,int v,int *pool,int s,int n)
 			record[s1]=1;
 			array[j]=s1;
 		}
-		for(j=0;j<n;j+=s)//selection
+		for(j=1;j<=n;j+=s)//selection
 		{
 			int winnerFitness=*(p+array[j]*(v+1));
 			int winner=j;
@@ -252,7 +252,7 @@ void tournamentSelection(int *p,int v,int *pool,int s,int n)
 			}
 		}
 	}
-	for(i=0;i<n;i++)
+	for(i=1;i<=n;i++)
 	{
 		for(j=0;j<=v;j++)
 		{
@@ -277,7 +277,7 @@ void tournamentSelection(int *p,int v,int *pool,int s,int n)
 int condition(int *p,int v,int n)
 {
 	int i;
-	for(i=0;i<n;i++)
+	for(i=1;i<=n;i++)
 	{
 		if(*(p+i*(v+1))==0)
 		{
@@ -408,7 +408,7 @@ void printPopulation(int *p,int n,int v)
 {
 	int i,j;
 	printf("Print Population:\n");
-	for(i=0;i<n;i++)
+	for(i=0;i<=n;i++)
 	{
 		printf("%d ",*(p+i*(v+1)));
 		for(j=1;j<=v;j++)
@@ -432,9 +432,9 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 	init_count++;
 	init_index[init_count]=max_who;
 	colored[max_who]=1;
-	for(j=0;j<n;j++)
+	for(i=1;i<=n;i++)
 	{
-		*(p+j*(v+1)+init_index[init_count])=init_count;
+		*(p+i*(v+1)+init_index[init_count])=init_count;
 	}
 
 	for(i=2;i<=v;i++)
@@ -453,7 +453,7 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 		{
 			init_count++;
 			init_index[init_count]=max_who;
-			for(j=0;j<n;j++)
+			for(j=1;j<=n;j++)
 			{
 				*(p+j*(v+1)+max_who)=init_count;
 			}
@@ -474,14 +474,14 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 			continue;
 		else
 		{
-			for(j=0;j<n;j++)
+			for(j=1;j<=n;j++)
 			{
 				int random=rand()%k+1;
 				*(p+j*(v+1)+i)=random;
 			}
 		}
 	}
-	for(i=0;i<n;i++)
+	for(i=1;i<=n;i++)
 	{
 		*(p+i*(v+1))=fitness(g,p,v,i);
 	}
@@ -504,8 +504,8 @@ int main(int argc,char *argv[])
     int v=fileProcessing1(ptr);						//get vertices number
     int *g=(int*)malloc(sizeof(int)*(v+1)*(v+1));
     fileProcessing2(g,v,ptr);						//get graph (matrix)
-    int *p=(int*)malloc(sizeof(int)*n*(v+1));;		//n population, v = chromosome_length = vertices_number
-	int *pool=(int*)malloc(sizeof(int)*n*(v+1));
+    int *p=(int*)malloc(sizeof(int)*(n+1)*(v+1));;	//n population, v = chromosome_length = vertices_number
+	int *pool=(int*)malloc(sizeof(int)*(n+1)*(v+1));
     while(repeat>0)									//repeat r times
     {
 		int generation=0;
@@ -521,6 +521,8 @@ int main(int argc,char *argv[])
             //localSearch(g,p,v,c2,lsl,k);
             updatePopulation(p,p1,p2,c1,c2,v);
 			generation++;
+			getchar();
+			printPopulation(p,n,v);
 			//printResult(p,v,n,generation);
         }
 		printResult(p,v,n,generation);
