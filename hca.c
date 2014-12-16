@@ -410,7 +410,7 @@ void printPopulation(int *p,int n,int v)
 	printf("Print Population:\n");
 	for(i=0;i<=n;i++)
 	{
-		printf("%d ",*(p+i*(v+1)));
+		printf("%2d ",*(p+i*(v+1)));
 		for(j=1;j<=v;j++)
 		{
 			printf("%d ",*(p+i*(v+1)+j));
@@ -423,6 +423,10 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 {
     int i,j,l,m;
 	int colored[v+1];//record colord vertex
+	for(i=0;i<=v;i++)
+	{
+		colored[i]=0;
+	}
 	int init_index[v+1];
 	int init_count=0;
 	int max_degree=0;
@@ -459,7 +463,7 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 			}
 			colored[max_who]=1;
 		}
-		//printPopulation(p,n,v);
+		printPopulation(p,n,v);
 		/*
 		for(j=1;j<=init_count;j++)
 		{
@@ -470,8 +474,15 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 	}
 	for(i=1;i<=v;i++)
 	{
+		printf("%d ",colored[i]);
+	}
+	printf("\n");
+	for(i=1;i<=v;i++)
+	{
 		if(colored[i]==1)
-			continue;
+		{
+			*(p+i)=1;
+		}
 		else
 		{
 			for(j=1;j<=n;j++)
@@ -521,11 +532,10 @@ int main(int argc,char *argv[])
             //localSearch(g,p,v,c2,lsl,k);
             updatePopulation(p,p1,p2,c1,c2,v);
 			generation++;
-			getchar();
 			printPopulation(p,n,v);
-			//printResult(p,v,n,generation);
+			printResult(p,v,n,generation);
         }
-		printResult(p,v,n,generation);
+		//printResult(p,v,n,generation);
 		repeat--;
     }
     return(0);
