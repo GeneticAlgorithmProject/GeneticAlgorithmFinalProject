@@ -1,5 +1,5 @@
 //main
-void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v);
+void crossover(int *p,int v,int n);
 void tournamentSelection(int *p,int v,int s,int n);
 int calculate(int *g,int *p,int v,int k,int x);
 void outsideFitness(int *g,int *p,int n,int v,int k);
@@ -34,3 +34,4 @@ void printPopulation(int *p,int n,int v);
 void updatePopulation(int *p,int p1,int p2,int *c1,int *c2,int v);
 void localSearch(int *g,int *p,int v,int *c,int l,int k);
 void randomSelectParents(int n,int *p1,int *p2);
+void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v);
