@@ -37,18 +37,13 @@ int calculate(int *g,int *p,int v,int k,int x)
 	}
 	for(i=1;i<=v;i++)
 	{
+		printf("function=%d\n",*(p+x*(v+1)+i));
 		if(*(p+x*(v+1)+i)==1)
-		{
 			function1(g,chrom,v,k);
-		}
-		if(*(p+x*(v+1)+i)==2)
-		{
-			function1(g,chrom,v,k);
-		}
-		if(*(p+x*(v+1)+i)==3)
-		{
-			function1(g,chrom,v,k);
-		}
+		else if(*(p+x*(v+1)+i)==2)
+			function2(g,chrom,v,k);
+		else if(*(p+x*(v+1)+i)==3)
+			function3(g,chrom,v,k);
 	}
 	return(fitness(g,chrom,v,0));
 }
@@ -135,26 +130,44 @@ void tournamentSelection(int *p,int v,int s,int n)
 	*/
 }
 int function1(int *g,int *chrom,int v,int k)
-{
-	//srand(time(NULL));
-	int i,r;
-	r=rand()%v+1;
-	while(chrom[r]!=0||r==0)
-	{
-		r=(r+1)%(v+1);
+{	
+	int x=0;//x: 沒著色的node數
+	int i;
+	for(i=0;i<v;i++) {
+		if(chrom[i]==0) {
+			x++;
+		}
 	}
-	chrom[r]=rand()%k+1;
+	int* a = (int*)malloc(sizeof(int)*(k));
+	srand(time(NULL));
+	int l=rand()%x;
+	for(i=0; i<x; i++) {
+		if (chrom[i]==0) {
+			chrom[i]=rand()%k+1;
+		}
+	}	
 }
 int function2(int *g,int *chrom,int v,int k)
 {
+	int max_degree=0;
+	int max_who=0;
+	int order =1;
+	int i;
+	int colored[k] ;
 	srand(time(NULL));
-	int i,r;
-	r=rand()%v+1;
-	while(chrom[r]!=0||r==0)
-	{
-		r=(r+1)%(v+1);
-	}
-	chrom[r]=rand()%k+1;
+	for(order=1;order<=v;order++){
+	 	getDegree(g,v,order,&max_who,&max_degree);
+	 	if(*(chrom+(max_who-1))!=0)continue;
+	 	for(i=1;i<v;i++){
+	 		if((*g+(i*(v+1)+max_degree))==0)continue;
+	 		if(*(chrom+(i-1))!=0)
+	 			colored[*(chrom+(i-1))] = colored[*(chrom+(i-1))];
+	 	}
+	 	for(i=0;i<k;i++)
+	 		if(colored[i]==0)*(chrom+max_who-1) = 1;
+	 		if(i==k)
+				*(chrom+max_who-1) = (rand()%k)+1;
+ 	}
 }
 int function3(int *g,int *chrom,int v,int k)
 {
