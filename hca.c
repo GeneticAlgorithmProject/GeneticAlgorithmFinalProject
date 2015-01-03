@@ -11,10 +11,43 @@
 #include"hca.h"
 int function1(int *g,int *chrom,int v,int k)
 {
-	
+	int x=0;//x: 沒著色的node數
+    for (int i=0; i<v;i++) {
+        if (chrom[i]==0) {
+            x++;
+        }
+    }
+    int* a = (int*)malloc(sizeof(int)*(k));
+    srand(time(NULL));
+    int l=rand()%x;
+    for (int i=0; i<x; i++) {
+        if (chrom[i]==0) {
+            chrom[i]=rand()%k+1;
+        }
+    }	
 }
 int function2(int *g,int *chrom,int v,int k)
 {
+	int max_degree=0;
+    int max_who=0;
+    int order =1;
+    int i;
+    int colored[k] ;
+    srand(time(NULL));
+    for(order=1;order<=v;order++){
+        getDegree(g,v,order,&max_who,&max_degree);
+        if(*(chrom+(max_who-1))!=0)continue;
+        for(i=1;i<v;i++){
+            if((*g+(i*(v+1)+max_degree))==0)continue;
+            if(*(chrom+(i-1))!=0)
+                colored[*(c+(i-1))] = colored[*(chrom+(i-1))];
+        }
+        for(i=0;i<k;i++)
+            if(colored[i]==0)*(chrom+max_who-1) = 1;
+        if(i==k)
+            *(chrom+max_who-1) = (rand()%k)+1;
+    }
+
 }
 int function3(int *g,int *chrom,int v,int k)
 {
