@@ -9,48 +9,112 @@
 #include<string.h>
 #include<time.h>
 #include"hca.h"
+void tournamentSelection(int *p,int v,int s,int n)
+{
+	srand(time(NULL));
+	int i,j,m;
+	int array[n+1];
+	int record[n+1];
+	int *pop=(int*)malloc(sizeof(int)*(n+1)*(v+1));
+	int count=1;
+	for(i=0;i<=n;i++)
+	{
+		for(j=0;j<=v;j++)
+		{
+			*(pop+i*(v+1)+j)=0;
+		}
+	}
+	for(i=0;i<s;i++)
+	{
+		for(j=1;j<=n;j++)
+		{
+			record[j]=0;
+		}
+		for(j=1;j<=n;j++)//random array
+		{
+			array[j]=j;
+		}
+		for(j=1;j<=n;j++)
+		{
+			int r=rand()%n+1;
+			int temp=array[j];
+			array[j]=array[r];
+			array[r]=temp;
+		}
+		for(j=1;j<=n;j+=s)//selection
+		{
+			int winnerFitness=*(p+array[j]*(v+1));
+			int winner=j;
+			for(m=1;m<s;m++)
+			{
+				if(winner>*(p+array[j+m]*(v+1)))
+				{
+					winnerFitness=*(p+array[j+m]*(v+1));
+					winner=j+m;
+				}
+			}
+			int a;
+			for(a=0;a<=v;a++)
+			{
+				*(pop+count*(v+1)+a)=*(p+array[winner]*(v+1)+a);
+			}
+			count++;
+		}
+	}
+	for(i=0;i<=n;i++)
+	{
+		for(j=0;j<=v;j++)
+		{
+			*(p+i*(v+1)+j)=*(pop+i*(v+1)+j);
+		}
+	}
+	/* be comment;
+	for(i=0;i<n;i++){
+		int winner = randomarray[0][i];
+		int WinnderFitness =  *(p+winner*(v+1));
+		
+		int challenger = randomarray[1][i];
+		int ChallengerFitness = *(p+challenger*(v+1));
+		if(ChallengerFitness > WinnderFitness){
+			winner = challenger;
+			WinnderFitness = ChallengerFitness;
+		}
+		*(pool+i) = winner;
+	}
+	*/
+}
 int function1(int *g,int *chrom,int v,int k)
 {
-	int x=0;//x: 沒著色的node數
-    for (int i=0; i<v;i++) {
-        if (chrom[i]==0) {
-            x++;
-        }
-    }
-    int* a = (int*)malloc(sizeof(int)*(k));
-    srand(time(NULL));
-    int l=rand()%x;
-    for (int i=0; i<x; i++) {
-        if (chrom[i]==0) {
-            chrom[i]=rand()%k+1;
-        }
-    }	
+	srand(time(NULL));
+	int i,r;
+	r=rand()%v+1;
+	while(chrom[r]!=0)
+	{
+		r=(r+1)%v;
+	}
+	chrom[r]=rand()%k+1;
 }
 int function2(int *g,int *chrom,int v,int k)
 {
-	int max_degree=0;
-    int max_who=0;
-    int order =1;
-    int i;
-    int colored[k] ;
-    srand(time(NULL));
-    for(order=1;order<=v;order++){
-        getDegree(g,v,order,&max_who,&max_degree);
-        if(*(chrom+(max_who-1))!=0)continue;
-        for(i=1;i<v;i++){
-            if((*g+(i*(v+1)+max_degree))==0)continue;
-            if(*(chrom+(i-1))!=0)
-                colored[*(c+(i-1))] = colored[*(chrom+(i-1))];
-        }
-        for(i=0;i<k;i++)
-            if(colored[i]==0)*(chrom+max_who-1) = 1;
-        if(i==k)
-            *(chrom+max_who-1) = (rand()%k)+1;
-    }
-
+	srand(time(NULL));
+	int i,r;
+	r=rand()%v+1;
+	while(chrom[r]!=0)
+	{
+		r=(r+1)%v;
+	}
+	chrom[r]=rand()%k+1;
 }
 int function3(int *g,int *chrom,int v,int k)
 {
+	srand(time(NULL));
+	int i,r;
+	r=rand()%v+1;
+	while(chrom[r]!=0)
+	{
+		r=(r+1)%v;
+	}
+	chrom[r]=rand()%k+1;
 }
 void localSearch(int *g,int *p,int v,int *c,int l,int k)
 {
@@ -210,6 +274,23 @@ int fitness(int *g,int *p,int v,int x)
 	}
 	return(f);
 }
+void crossover(int *p,int v,int n)
+{
+	int i,j;
+	for(i=1;i<=n;i+=2)
+	{
+		for(j=1;j<=v;j++)
+		{
+			int r=rand()%2;
+			if(r==1)
+			{
+				int temp=*(p+i*(v+1)+j);
+				*(p+i*(v+1)+j)=*(p+(i+1)*(v+1)+j);
+				*(p+(i+1)*(v+1)+j)=temp;
+			}
+		}
+	}
+}			
 void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v)
 {
 	int i,r;
@@ -256,78 +337,7 @@ void uniformArray(int *array,int n)
 	free(base);
 }
 
-void tournamentSelection(int *p,int v,int s,int n)
-{
-	srand(time(NULL));
-	int i,j,m;
-	int array[n+1];
-	int record[n+1];
-	int *pop=(int*)malloc(sizeof(int)*(n+1)*(v+1));
-	for(i=0;i<=n;i++)
-	{
-		for(j=0;j<=v;j++)
-		{
-			*(pop+i*(v+1)+j)=0;
-		}
-	}
-	for(i=0;i<s;i++)
-	{
-		for(j=1;j<=n;j++)
-		{
-			record[j]=0;
-		}
-		for(j=1;j<=n;j++)//random array
-		{
-			array[j]=j;
-		}
-		for(j=1;j<=n;j++)
-		{
-			int r=rand()%n+1;
-			int temp=array[j];
-			array[j]=array[r];
-			array[r]=temp;
-		}
-		for(j=1;j<=n;j+=s)//selection
-		{
-			int winnerFitness=*(p+array[j]*(v+1));
-			int winner=j;
-			for(m=1;m<s;m++)
-			{
-				if(winner>*(p+array[j+m]*(v+1)))
-				{
-					winnerFitness=*(p+array[j+m]*(v+1));
-					winner=j+m;
-				}
-			}
-			int a;
-			for(a=0;a<=v;a++)
-			{
-				*(pop+i*(n/s)*(v+1)+j*(v+1)+a)=*(p+array[j+m]*(v+1)+a);
-			}
-		}
-	}
-	for(i=0;i<=n;i++)
-	{
-		for(j=0;j<=v;j++)
-		{
-			*(p+i*(v+1)+j)=*(pop+i*(v+1)+j);
-		}
-	}
-	/* be comment;
-	for(i=0;i<n;i++){
-		int winner = randomarray[0][i];
-		int WinnderFitness =  *(p+winner*(v+1));
-		
-		int challenger = randomarray[1][i];
-		int ChallengerFitness = *(p+challenger*(v+1));
-		if(ChallengerFitness > WinnderFitness){
-			winner = challenger;
-			WinnderFitness = ChallengerFitness;
-		}
-		*(pool+i) = winner;
-	}
-	*/
-}
+
 
 int condition(int *p,int v,int n)
 {
@@ -538,8 +548,9 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 
 void init_new(int *g,int *p, int n,int v,int k,int a)
 {
+	srand(time(NULL));
 	int i,j;
-	for(i=0;i<=v;i++)
+	for(i=0;i<=n;i++)
 	{
 		for(j=0;j<=v;j++)
 		{
@@ -556,8 +567,6 @@ void init_new(int *g,int *p, int n,int v,int k,int a)
 	}
 	outsideFitness(g,p,n,v,k);
 }
-
-
 int calculate(int *g,int *p,int v,int k,int x)
 {
 	int i;
