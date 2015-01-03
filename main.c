@@ -34,6 +34,8 @@ int main(int argc,char *argv[])
             int p1,p2,c1[v+1],c2[v+1];
             tournamentSelection(p,v,s,n);
             //randomSelectParents(n,&p1,&p2);
+			crossover(p,v,n);
+			outsideFitness(g,p,n,v,k);
             //simpleCrossover(g,p,p1,p2,c1,c2,v);
             //localSearch(g,p,v,c1,lsl,k);
             //localSearch(g,p,v,c2,lsl,k);
