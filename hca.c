@@ -296,7 +296,7 @@ int fileProcessing1(char *ptr)//get v
 	{
 		while(!feof(fp))
 		{
-			if((fgets(temp,100,fp)!=NULL)&&(strcmp(temp,"p")==1))
+			if((fgets(temp,100,fp)!=NULL)&&(temp[0]=='p'))
 			{
 				char *tt;
 				tt=strtok(temp," ");
@@ -309,6 +309,8 @@ int fileProcessing1(char *ptr)//get v
 				{
 					tt=strtok(NULL," ");
 					fclose(fp);
+					printf("%s\n",tt);
+					getchar();
 					return(atoi(tt));
 				}
 			}
@@ -333,7 +335,7 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 	FILE *fp;
 	char temp[100];
 	fp=fopen(ptr,"r");
-	if(fp==NULL)perror("Error opening file.");
+	if(fp==NULL);//perror("Error opening file.");
 	else
 	{
 		int i,j;
@@ -358,26 +360,13 @@ void fileProcessing2(int *g,int v,char *ptr)//get graph (matrix)
 				ss=strtok(NULL," ");
 				int t=atoi(tt);
 				int s=atoi(ss);
-				//printf("t=%d s=%d\n",t,s);
 				*(g+t*(v+1)+s)=1;
 				*(g+s*(v+1)+t)=1;
-				//printf("g[%d][%d]=%d\n",t,s,*(g+t*v+s));
 			}
 		}
 		fclose(fp);
 	}
 	setDegree(g,v);
-	/*
-	int i,j;
-	for(i=0;i<=v;i++)
-	{
-		for(j=0;j<=v;j++)
-		{
-			printf("%d ",*(g+i*(v+1)+j));
-		}
-		printf("\n");
-	}
-	*/
 }
 int compare(const void *a,const void *b)
 {
