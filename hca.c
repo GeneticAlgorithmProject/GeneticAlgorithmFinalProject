@@ -9,6 +9,57 @@
 #include<string.h>
 #include<time.h>
 #include"hca.h"
+int fitness(int *g,int *p,int v,int x)
+{
+	int i,j;
+	int f=0;
+	for(i=1;i<=v;i++)
+	{
+		for(j=1;j<=v;j++)
+		{
+			if(i==j)continue;
+			if((*(g+i*(v+1)+j)==1)&&(*(p+x*(v+1)+i)==*(p+x*(v+1)+j)))
+			{
+				f++;
+				break;
+			}
+		}
+	}
+	return(f);
+}
+int calculate(int *g,int *p,int v,int k,int x)
+{
+	int i;
+	int chrom[v+1];
+	for(i=0;i<=v;i++)
+	{
+		chrom[i]=0;
+	}
+	for(i=1;i<=v;i++)
+	{
+		if(*(p+x*(v+1)+i)==1)
+		{
+			function1(g,chrom,v,k);
+		}
+		if(*(p+x*(v+1)+i)==2)
+		{
+			function1(g,chrom,v,k);
+		}
+		if(*(p+x*(v+1)+i)==3)
+		{
+			function1(g,chrom,v,k);
+		}
+	}
+	return(fitness(g,chrom,v,0));
+}
+void outsideFitness(int *g,int *p,int n,int v,int k)
+{
+	int i;
+	for(i=1;i<=n;i++)
+	{
+		*(p+i*(v+1))=calculate(g,p,v,k,i);
+	}
+}
 void tournamentSelection(int *p,int v,int s,int n)
 {
 	srand(time(NULL));
@@ -85,12 +136,12 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 int function1(int *g,int *chrom,int v,int k)
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 	int i,r;
 	r=rand()%v+1;
-	while(chrom[r]!=0)
+	while(chrom[r]!=0||r==0)
 	{
-		r=(r+1)%v;
+		r=(r+1)%(v+1);
 	}
 	chrom[r]=rand()%k+1;
 }
@@ -99,9 +150,9 @@ int function2(int *g,int *chrom,int v,int k)
 	srand(time(NULL));
 	int i,r;
 	r=rand()%v+1;
-	while(chrom[r]!=0)
+	while(chrom[r]!=0||r==0)
 	{
-		r=(r+1)%v;
+		r=(r+1)%(v+1);
 	}
 	chrom[r]=rand()%k+1;
 }
@@ -110,9 +161,9 @@ int function3(int *g,int *chrom,int v,int k)
 	srand(time(NULL));
 	int i,r;
 	r=rand()%v+1;
-	while(chrom[r]!=0)
+	while(chrom[r]!=0||r==0)
 	{
-		r=(r+1)%v;
+		r=(r+1)%(v+1);
 	}
 	chrom[r]=rand()%k+1;
 }
@@ -256,24 +307,7 @@ void printResult(int *p,int v,int n,int gen)
 	printBestPopulation(p,v,n);
 	printf("\n");
 }
-int fitness(int *g,int *p,int v,int x)
-{
-	int i,j;
-	int f=0;
-	for(i=1;i<=v;i++)
-	{
-		for(j=1;j<=v;j++)
-		{
-			if(i==j)continue;
-			if((*(g+i*(v+1)+j)==1)&&(*(p+x*(v+1)+i)==*(p+x*(v+1)+j)))
-			{
-				f++;
-				break;
-			}
-		}
-	}
-	return(f);
-}
+
 void crossover(int *p,int v,int n)
 {
 	int i,j;
@@ -566,37 +600,4 @@ void init_new(int *g,int *p, int n,int v,int k,int a)
 		}
 	}
 	outsideFitness(g,p,n,v,k);
-}
-int calculate(int *g,int *p,int v,int k,int x)
-{
-	int i;
-	int chrom[v+1];
-	for(i=0;i<=v;i++)
-	{
-		chrom[i]=0;
-	}
-	for(i=1;i<=v;i++)
-	{
-		if(*(p+x*(v+1)+i)==1)
-		{
-			function1(g,chrom,v,k);
-		}
-		if(*(p+x*(v+1)+i)==2)
-		{
-			function2(g,chrom,v,k);
-		}
-		if(*(p+x*(v+1)+i)==3)
-		{
-			function3(g,chrom,v,k);
-		}
-	}
-	return(fitness(g,chrom,v,0));
-}
-void outsideFitness(int *g,int *p,int n,int v,int k)
-{
-	int i;
-	for(i=1;i<=n;i++)
-	{
-		*(p+i*(v+1))=calculate(g,p,v,k,i);
-	}
 }
