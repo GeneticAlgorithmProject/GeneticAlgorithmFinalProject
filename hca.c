@@ -1,5 +1,5 @@
 /*
-1. g[0][i] degree of vertex i
+1. g[0][i]=g[i][0] degree of vertex i
 2. g[i][j]=g[j][i]=1 if vertex i and vertex j adjacent
 3. if (p[0][i]=1) => do not change the color of vertex i during localsearch
 4. p[i][j] population i's jth vertex's color 
@@ -8,6 +8,17 @@
 #include<stdlib.h>
 #include<string.h>
 #include<time.h>
+#include"hca.h"
+int function1(int *g,int *chrom,int v,int k)
+{
+	
+}
+int function2(int *g,int *chrom,int v,int k)
+{
+}
+int function3(int *g,int *chrom,int v,int k)
+{
+}
 void localSearch(int *g,int *p,int v,int *c,int l,int k)
 {
 	int i,j;
@@ -211,12 +222,21 @@ void uniformArray(int *array,int n)
 	}
 	free(base);
 }
-void tournamentSelection(int *p,int v,int *pool,int s,int n)
+
+void tournamentSelection(int *p,int v,int s,int n)
 {
 	srand(time(NULL));
 	int i,j,m;
 	int array[n+1];
 	int record[n+1];
+	int *pop=(int*)malloc(sizeof(int)*(n+1)*(v+1));
+	for(i=0;i<=n;i++)
+	{
+		for(j=0;j<=v;j++)
+		{
+			*(pop+i*(v+1)+j)=0;
+		}
+	}
 	for(i=0;i<s;i++)
 	{
 		for(j=1;j<=n;j++)
@@ -225,13 +245,14 @@ void tournamentSelection(int *p,int v,int *pool,int s,int n)
 		}
 		for(j=1;j<=n;j++)//random array
 		{
-			int s1=rand()%n;
-			while(record[s1]==1)
-			{
-				s1=(s1+1)%n;
-			}
-			record[s1]=1;
-			array[j]=s1;
+			array[j]=j;
+		}
+		for(j=1;j<=n;j++)
+		{
+			int r=rand()%n+1;
+			int temp=array[j];
+			array[j]=array[r];
+			array[r]=temp;
 		}
 		for(j=1;j<=n;j+=s)//selection
 		{
@@ -248,18 +269,18 @@ void tournamentSelection(int *p,int v,int *pool,int s,int n)
 			int a;
 			for(a=0;a<=v;a++)
 			{
-				*(pool+i*(n/s)*(v+1)+a)=*(p+winner*(v+1)+a);
+				*(pop+i*(n/s)*(v+1)+j*(v+1)+a)=*(p+array[j+m]*(v+1)+a);
 			}
 		}
 	}
-	for(i=1;i<=n;i++)
+	for(i=0;i<=n;i++)
 	{
 		for(j=0;j<=v;j++)
 		{
-			*(p+i*(v+1)+j)=*(pool+i*(v+1)+j);
+			*(p+i*(v+1)+j)=*(pop+i*(v+1)+j);
 		}
 	}
-	/*
+	/* be comment;
 	for(i=0;i<n;i++){
 		int winner = randomarray[0][i];
 		int WinnderFitness =  *(p+winner*(v+1));
@@ -274,6 +295,7 @@ void tournamentSelection(int *p,int v,int *pool,int s,int n)
 	}
 	*/
 }
+
 int condition(int *p,int v,int n)
 {
 	int i;
@@ -309,8 +331,6 @@ int fileProcessing1(char *ptr)//get v
 				{
 					tt=strtok(NULL," ");
 					fclose(fp);
-					printf("%s\n",tt);
-					getchar();
 					return(atoi(tt));
 				}
 			}
@@ -463,11 +483,6 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 	}
 	for(i=1;i<=v;i++)
 	{
-		printf("%d ",colored[i]);
-	}
-	printf("\n");
-	for(i=1;i<=v;i++)
-	{
 		if(colored[i]==1)
 		{
 			*(p+i)=1;
@@ -487,45 +502,59 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
 	}
 	//printPopulation(p,n,v);
 }
-int main(int argc,char *argv[])
-{
-    if(argc!=7)
-    {
-        printf("population_size repeat_times localsearch_length file_name chromatic_number selection_pressure\n");
-        return(-1);
-    }
-    int n=atoi(argv[1]);							//population size
-    int repeat=atoi(argv[2]);						//repeat times
-    int lsl=atoi(argv[3]);							//localsearch length
-    char *ptr=argv[4];								//file name
-    int k=atoi(argv[5]);							//chromatic number
-    int s=atoi(argv[6]);							//selection pressure
 
-    int v=fileProcessing1(ptr);						//get vertices number
-    int *g=(int*)malloc(sizeof(int)*(v+1)*(v+1));
-    fileProcessing2(g,v,ptr);						//get graph (matrix)
-    int *p=(int*)malloc(sizeof(int)*(n+1)*(v+1));;	//n population, v = chromosome_length = vertices_number
-	int *pool=(int*)malloc(sizeof(int)*(n+1)*(v+1));
-    while(repeat>0)									//repeat r times
-    {
-		int generation=0;
-        init(p,g,n,v,k);
-		
-        while(condition(p,v,n)==1)
-        {
-            int p1,p2,c1[v+1],c2[v+1];
-            //tournamentSelection(p,v,pool,s,n);
-            randomSelectParents(n,&p1,&p2);
-            simpleCrossover(g,p,p1,p2,c1,c2,v);
-            //localSearch(g,p,v,c1,lsl,k);
-            //localSearch(g,p,v,c2,lsl,k);
-            updatePopulation(p,p1,p2,c1,c2,v);
-			generation++;
-			printPopulation(p,n,v);
-			printResult(p,v,n,generation);
-        }
-		//printResult(p,v,n,generation);
-		repeat--;
-    }
-    return(0);
+void init_new(int *g,int *p, int n,int v,int k,int a)
+{
+	int i,j;
+	for(i=0;i<=v;i++)
+	{
+		for(j=0;j<=v;j++)
+		{
+			*(p+i*(v+1)+j)=0;
+		}
+	}
+	for(i=1;i<=n;i++)
+	{
+		for(j=1;j<=v;j++)
+		{
+			int temp=rand()%3+1;
+			*(p+i*(v+1)+j)=temp;
+		}
+	}
+	outsideFitness(g,p,n,v,k);
+}
+
+
+int calculate(int *g,int *p,int v,int k,int x)
+{
+	int i;
+	int chrom[v+1];
+	for(i=0;i<=v;i++)
+	{
+		chrom[i]=0;
+	}
+	for(i=1;i<=v;i++)
+	{
+		if(*(p+x*(v+1)+i)==1)
+		{
+			function1(g,chrom,v,k);
+		}
+		if(*(p+x*(v+1)+i)==2)
+		{
+			function2(g,chrom,v,k);
+		}
+		if(*(p+x*(v+1)+i)==3)
+		{
+			function3(g,chrom,v,k);
+		}
+	}
+	return(fitness(g,chrom,v,0));
+}
+void outsideFitness(int *g,int *p,int n,int v,int k)
+{
+	int i;
+	for(i=1;i<=n;i++)
+	{
+		*(p+i*(v+1))=calculate(g,p,v,k,i);
+	}
 }
