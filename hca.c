@@ -191,15 +191,15 @@ int function2(int *g,int *chrom,int v,int k)
 	for(order=1;order<=v;order++){
 	 	getDegree(g,v,order,&max_who,&max_degree);
 	 	if(*(chrom+(max_who))!=0)continue;
-	 	for(i=1;i<v;i++){
-	 		if((*g+(i*(v+1)+max_degree))==0)continue;
-	 		if(*(chrom+(i-1))!=0)
-	 			colored[*(chrom+(i-1))] = colored[*(chrom+(i-1))];
+	 	for(i=1;i<=v;i++){
+	 		if((*(g+i*(v+1)+max_who))==0)continue;
+	 		if(*(chrom+(i))!=0)
+	 			colored[*(chrom+(i))] = colored[*(chrom+(i))];
 	 	}
 	 	for(i=0;i<k;i++)
-	 		if(colored[i]==0)*(chrom+max_who-1) = 1;
+	 		if(colored[i]==0)*(chrom+max_who) = 1;
 	 	if(i==k)
-			*(chrom+max_who-1) = (rand()%k)+1;
+			*(chrom+max_who) = (rand()%k)+1;
  	}
 }
 int function3(int *g,int *chrom,int v,int k)
