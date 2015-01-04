@@ -20,6 +20,7 @@ int main(int argc,char *argv[])
     int s=atoi(argv[6]);							//selection pressure
     int a=atoi(argv[7]);
     int v=fileProcessing1(ptr);						//get vertices number
+    printf("v=%d\n",v);
     int *g=(int*)malloc(sizeof(int)*(v+1)*(v+1));
     fileProcessing2(g,v,ptr);						//get graph (matrix)
     int *p=(int*)malloc(sizeof(int)*(n+1)*(v+1));	//n population, v = chromosome_length = vertices_number

@@ -9,6 +9,10 @@
 #include<string.h>
 #include<time.h>
 #include"hca.h"
+void get_graph()
+{
+
+}
 int fitness(int *g,int *p,int v,int x)
 {
     int i,j;
@@ -29,23 +33,31 @@ int fitness(int *g,int *p,int v,int x)
 }
 int calculate(int *g,int *p,int v,int k,int x)
 {
-    int i;
-    int chrom[v+1];
-    for(i=0;i<=v;i++)
-    {
-        chrom[i]=0;
-    }
-    for(i=1;i<=v;i++)
-    {
-        printf("function=%d\n",*(p+x*(v+1)+i));
-        if(*(p+x*(v+1)+i)==1)
-            function1(g,chrom,v,k);
-        else if(*(p+x*(v+1)+i)==2)
-            function2(g,chrom,v,k);
-        else if(*(p+x*(v+1)+i)==3)
-            function3(g,chrom,v,k);
-    }
-    return(fitness(g,chrom,v,0));
+	int i,j;
+	int chrom[v+1];
+	for(i=0;i<=v;i++)
+	{
+		chrom[i]=0;
+	}
+		//printf("why\n");
+	for(i=1;i<=v;i++)
+	{
+		//printf("====function=%d\n",*(p+x*(v+1)+i));
+		//for(j=1;j<=v;j++)
+		//	printf("chrom[%d]=%d\n",j,chrom[j]);
+		//printf("----\n");
+		if(*(p+x*(v+1)+i)==1)
+			function2(g,chrom,v,k);
+		else if(*(p+x*(v+1)+i)==2)
+			function2(g,chrom,v,k);
+		else if(*(p+x*(v+1)+i)==3)
+			function3(g,chrom,v,k);
+		//for(j=1;j<=v;j++)
+		//		printf("chrom[%d]=%d\n",j,chrom[j]);
+		//printf("====function=%ddone\n",*(p+x*(v+1)+i));
+		//getchar();getchar();
+	}
+	return(fitness(g,chrom,v,0));
 }
 void outsideFitness(int *g,int *p,int n,int v,int k)
 {
@@ -139,8 +151,8 @@ void function1(int *g,int *c,int v,int k)
 //        r=(r+1)%(v+1);
 //    }
 //    chrom[r]=rand()%k+1;
-    int x=0, y=0;
-    for (int i=0; i<v; i++) {
+    int i,j,x=0, y=0;
+    for (i=0; i<v; i++) {
         if (c[i]==0)
             y++;
         else
@@ -148,7 +160,7 @@ void function1(int *g,int *c,int v,int k)
     }
     int* m = (int*)malloc(sizeof(int)*(x));
     int* n = (int*)malloc(sizeof(int)*(y));
-    for (int i=0; i<v; i++) {
+    for (i=0; i<v; i++) {
         if (c[i]==0){
             m[y]=i;
             y++;
@@ -160,8 +172,8 @@ void function1(int *g,int *c,int v,int k)
     }
     int* o = (int*)malloc(sizeof(int)*(v));
     int r=0;//not neibor
-    for (int i=1; i<y; i++) {//n
-        for(int j=1; j<x; j++) {//m
+    for (i=1; i<y; i++) {//n
+        for(j=1; j<x; j++) {//m
             if (*g+(n[i]*(v+1)+m[j])==1) continue;
             else
                 if (j==x-1) {
@@ -172,41 +184,54 @@ void function1(int *g,int *c,int v,int k)
     }
     int* t = (int*)malloc(sizeof(int)*(r));
     int max=0, f=0;
-    for (int i=0; i<r; i++) {
-        for (int j=0; j<v; j++) {
+    for (i=0; i<r; i++) {
+        for (j=0; j<v; j++) {
             if ((*g+o[r]*(v+1)+1+j)==1)
                 t[i]++;
         }
     }
-    for (int i=0; i<r; i++) {
+    for (i=0; i<r; i++) {
         if (t[i]>max) {
             f=i;
             max=t[i];
         }
     }
     *(c+(f+1))=rand()%k+1;
+
 }
 void function2(int *g,int *chrom,int v,int k)
 {
-    int max_degree=0;
-    int max_who=0;
-    int order =1;
-    int i;
-    int colored[k] ;
-    srand(time(NULL));
-    for(order=1;order<=v;order++){
-        getDegree(g,v,order,&max_who,&max_degree);
-        if(*(chrom+(max_who-1))!=0)continue;
-        for(i=1;i<v;i++){
-            if((*g+(i*(v+1)+max_degree))==0)continue;
-            if(*(chrom+(i-1))!=0)
-                colored[*(chrom+(i-1))] = colored[*(chrom+(i-1))];
-        }
-        for(i=0;i<k;i++)
-            if(colored[i]==0)*(chrom+max_who-1) = 1;
-        if(i==k)
-            *(chrom+max_who-1) = (rand()%k)+1;
-    }
+	//printf("this is function2\n");
+	int max_degree=0;
+	int max_who=0;
+	int order =1;
+	int i;
+	int colored_bool = 0;
+	int colored[k] ;
+	srand(time(NULL));
+	for(i=0;i<k;i++)colored[i]=0;
+	for(order=1;order<=v;order++){
+	 	getDegree(g,v,order,&max_who,&max_degree);
+		//printf("order=%d,max_who=%d\n",order,max_who);
+	 	if(*(chrom+(max_who))!=0)continue;
+	 	for(i=1;i<=v;i++){
+	 		if((*(g+i*(v+1)+max_who))==0)continue;
+	 		if(*(chrom+(i))!=0)
+	 			colored[*(chrom+(i))] = colored[*(chrom+(i))]+1;
+	 	}
+		//printf("no continue\n");for(i=0;i<k;i++)printf("color[%d]=is %d\n",i+1,colored[i]);
+	 	for(i=0;i<k;i++){
+	 		if(colored[i]==0){
+				*(chrom+max_who) = i+1;
+				colored_bool = 1;
+				//printf("color=%d\n",i);
+				break;
+			}
+		}
+		if(colored_bool ==1)break;
+	 	if(i==k)
+			*(chrom+max_who) = (rand()%k)+1;
+ 	}
 }
 void function3(int *g,int *chrom,int v,int k)
 {
