@@ -131,7 +131,7 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 int function1(int *g,int *c,int v,int k)
 {	
-	int x,y,i,j;//x: ¤w¶î; y:¥¼¶î
+	int x,y,i,j;//x: å·²å¡—; y:æœªå¡—
     for (i=0; i<v; i++) {
         if (c[i]==0)
             y++;
@@ -152,7 +152,7 @@ int function1(int *g,int *c,int v,int k)
         }
     }
     int* o = (int*)malloc(sizeof(int)*(v));
-    int r=0;//¨S¶ñªº¤¤¸ò¤w¶ñªº¤£¬O¾F©~ªº
+    int r=0;//æ²’å¡«çš„ä¸­è·Ÿå·²å¡«çš„ä¸æ˜¯é„°å±…çš„
     for (i=1; i<y; i++) {//n
         for(j=1; j<x; j++) {//m
             if (*g+(n[i]*(v+1)+m[j])==0) continue;
