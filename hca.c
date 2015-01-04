@@ -129,23 +129,56 @@ void tournamentSelection(int *p,int v,int s,int n)
 	}
 	*/
 }
-int function1(int *g,int *chrom,int v,int k)
+int function1(int *g,int *c,int v,int k)
 {	
-	int x=0;//x: 沒著色的node數
-	int i;
-	for(i=0;i<v;i++) {
-		if(chrom[i]==0) {
-			x++;
-		}
-	}
-	int* a = (int*)malloc(sizeof(int)*(k));
-	srand(time(NULL));
-	int l=rand()%x;
-	for(i=0; i<x; i++) {
-		if (chrom[i]==0) {
-			chrom[i]=rand()%k+1;
-		}
-	}	
+	int x,y,i,j;//x: 已塗; y:未塗
+    for (i=0; i<v; i++) {
+        if (c[i]==0)
+            y++;
+        else
+            x++;
+    }
+    int* m = (int*)malloc(sizeof(int)*(x));
+    int* n = (int*)malloc(sizeof(int)*(y));
+    int a=0, b=0;
+    for (i=0; i<v; i++) {
+        if (c[i]==0){
+            m[y]=i;
+            y++;
+        }
+        else{	
+            n[y]=i;
+            x++;
+        }
+    }
+    int* o = (int*)malloc(sizeof(int)*(v));
+    int r=0;//沒填的中跟已填的不是鄰居的
+    for (i=1; i<y; i++) {//n
+        for(j=1; j<x; j++) {//m
+            if (*g+(n[i]*(v+1)+m[j])==0) continue;
+            else break;
+            if (j==x-1) {
+                r++;
+                o[r]=i;
+            }
+        }
+    }
+    int* t = (int*)malloc(sizeof(int)*(r));
+    int max=0, f=0;
+    for (i=0; i<r; i++) {
+        for (j=0; j<v; j++) {
+            if ((*g+o[r]*(v+1)+1+j)==1) {
+                t[i]++;
+            }
+        }
+    }
+    for (i=0; i<r; i++) {
+        if (t[i]>max) {
+            f=i;
+            max=t[i];
+        }
+    }
+    *(c+(f+1))=1;
 }
 int function2(int *g,int *chrom,int v,int k)
 {
@@ -157,7 +190,7 @@ int function2(int *g,int *chrom,int v,int k)
 	srand(time(NULL));
 	for(order=1;order<=v;order++){
 	 	getDegree(g,v,order,&max_who,&max_degree);
-	 	if(*(chrom+(max_who-1))!=0)continue;
+	 	if(*(chrom+(max_who))!=0)continue;
 	 	for(i=1;i<v;i++){
 	 		if((*g+(i*(v+1)+max_degree))==0)continue;
 	 		if(*(chrom+(i-1))!=0)
@@ -165,20 +198,20 @@ int function2(int *g,int *chrom,int v,int k)
 	 	}
 	 	for(i=0;i<k;i++)
 	 		if(colored[i]==0)*(chrom+max_who-1) = 1;
-	 		if(i==k)
-				*(chrom+max_who-1) = (rand()%k)+1;
+	 	if(i==k)
+			*(chrom+max_who-1) = (rand()%k)+1;
  	}
 }
 int function3(int *g,int *chrom,int v,int k)
 {
-	srand(time(NULL));
 	int i,r;
 	r=rand()%v+1;
 	while(chrom[r]!=0||r==0)
 	{
 		r=(r+1)%(v+1);
 	}
-	chrom[r]=rand()%k+1;
+	chrom[r]=rand()%k+1;	
+
 }
 void localSearch(int *g,int *p,int v,int *c,int l,int k)
 {
