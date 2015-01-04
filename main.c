@@ -45,7 +45,8 @@ int main(int argc,char *argv[])
             generation++;
             printPopulation(p,n,v);
             printResult(p,v,n,generation);
-            getchar();
+            //getchar();
+	    if(generation>10000)break;
         }
         //printResult(p,v,n,generation);
         repeat--;

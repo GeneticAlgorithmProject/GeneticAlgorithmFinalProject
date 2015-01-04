@@ -37,16 +37,15 @@ int calculate(int *g,int *p,int v,int k,int x)
     }
     for(i=1;i<=v;i++)
     {
-	    for(j=1;j<=v;j++)
-	    	printf("chrom[%d]=%d\n",j,chrom[j]);
-        printf("function=%d\n",*(p+x*(v+1)+i));
+//	    for(j=1;j<=v;j++)
+//	    	printf("chrom[%d]=%d\n",j,chrom[j]);
+  //      printf("function=%d\n",*(p+x*(v+1)+i));
         if(*(p+x*(v+1)+i)==1)
-            function1(g,chrom,v,k);
+            function3(g,chrom,v,k);
         else if(*(p+x*(v+1)+i)==2)
             function2(g,chrom,v,k);
         else if(*(p+x*(v+1)+i)==3)
             function3(g,chrom,v,k);
-	getchar();getchar();
     }
     return(fitness(g,chrom,v,0));
 }
