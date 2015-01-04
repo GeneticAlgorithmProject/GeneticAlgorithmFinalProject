@@ -4,7 +4,6 @@
  3. if (p[0][i]=1) => do not change the color of vertex i during localsearch
  4. p[i][j] population i's jth vertex's color
  */
-//ya~~~?
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -130,23 +129,62 @@ void tournamentSelection(int *p,int v,int s,int n)
      }
      */
 }
-void function1(int *g,int *chrom,int v,int k)
+void function1(int *g,int *c,int v,int k)
 {
-    int x=0;//x: ¨SµÛ¦âªºnode¼Æ
-    int i;
-    for(i=0;i<v;i++) {
-        if(chrom[i]==0) {
+//    srand(time(NULL));
+//    int i,r;
+//    r=rand()%v+1;
+//    while(chrom[r]!=0||r==0)
+//    {
+//        r=(r+1)%(v+1);
+//    }
+//    chrom[r]=rand()%k+1;
+    int x=0, y=0;
+    for (int i=0; i<v; i++) {
+        if (c[i]==0)
+            y++;
+        else
+            x++;
+    }
+    int* m = (int*)malloc(sizeof(int)*(x));
+    int* n = (int*)malloc(sizeof(int)*(y));
+    for (int i=0; i<v; i++) {
+        if (c[i]==0){
+            m[y]=i;
+            y++;
+        }
+        else{
+            n[y]=i;
             x++;
         }
     }
-    int* a = (int*)malloc(sizeof(int)*(k));
-    srand(time(NULL));
-    int l=rand()%x;
-    for(i=0; i<x; i++) {
-        if (chrom[i]==0) {
-            chrom[i]=rand()%k+1;
+    int* o = (int*)malloc(sizeof(int)*(v));
+    int r=0;//not neibor
+    for (int i=1; i<y; i++) {//n
+        for(int j=1; j<x; j++) {//m
+            if (*g+(n[i]*(v+1)+m[j])==1) continue;
+            else
+                if (j==x-1) {
+                    r++;
+                    o[r]=i;
+                }
         }
     }
+    int* t = (int*)malloc(sizeof(int)*(r));
+    int max=0, f=0;
+    for (int i=0; i<r; i++) {
+        for (int j=0; j<v; j++) {
+            if ((*g+o[r]*(v+1)+1+j)==1)
+                t[i]++;
+        }
+    }
+    for (int i=0; i<r; i++) {
+        if (t[i]>max) {
+            f=i;
+            max=t[i];
+        }
+    }
+    *(c+(f+1))=rand()%k+1;
 }
 void function2(int *g,int *chrom,int v,int k)
 {
