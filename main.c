@@ -18,16 +18,18 @@ int main(int argc,char *argv[])
     int s=atoi(argv[6]);							//selection pressure
 	int a=atoi(argv[7]);
     int v=fileProcessing1(ptr);						//get vertices number
+    printf("v=%d\n",v);
     int *g=(int*)malloc(sizeof(int)*(v+1)*(v+1));
     fileProcessing2(g,v,ptr);						//get graph (matrix)
     int *p=(int*)malloc(sizeof(int)*(n+1)*(v+1));	//n population, v = chromosome_length = vertices_number
 	int *pool=(int*)malloc(sizeof(int)*(n+1)*(v+1));
     while(repeat>0)									//repeat r times
     {
+	    printf("OK\n");
 		int generation=0;
         //init(p,g,n,v,k);
 		init_new(g,p,n,v,k,a);
-		//printPopulation(p,n,v);
+		printPopulation(p,n,v);
 		//getchar();
         while(condition(p,v,n)==1)
         {
@@ -43,7 +45,7 @@ int main(int argc,char *argv[])
 			generation++;
 			printPopulation(p,n,v);
 			printResult(p,v,n,generation);
-			getchar();
+			//getchar();
         }
 		//printResult(p,v,n,generation);
 		repeat--;
