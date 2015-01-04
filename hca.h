@@ -3,9 +3,9 @@ void crossover(int *p,int v,int n);
 void tournamentSelection(int *p,int v,int s,int n);
 int calculate(int *g,int *p,int v,int k,int x);
 void outsideFitness(int *g,int *p,int n,int v,int k);
-int function1(int *g,int *chrom,int v,int k);
-int function2(int *g,int *chrom,int v,int k);
-int function3(int *g,int *chrom,int v,int k);
+void function1(int *g,int *chrom,int v,int k);
+void function2(int *g,int *chrom,int v,int k);
+void function3(int *g,int *chrom,int v,int k);
 //important
 int fitness(int *g,int *p,int v,int x);
 //init
@@ -16,7 +16,7 @@ void init_new(int *g,int *p, int n,int v,int k,int a);
 //small
 int compare(const void *a,const void *b);
 void setDegree(int *g,int v);
-int getDegree(int *g,int v,int x,int *who,int *degree);
+void getDegree(int *g,int v,int x,int *who,int *degree);
 int condition(int *p,int v,int n);
 void paste(int *p,int p1,int *c1,int v);
 void uniformArray(int *array,int n);
