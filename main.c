@@ -43,7 +43,7 @@ int main(int argc,char *argv[])
 			generation++;
 			printPopulation(p,n,v);
 			printResult(p,v,n,generation);
-			getchar();
+			//getchar();
         }
 		//printResult(p,v,n,generation);
 		repeat--;

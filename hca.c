@@ -38,13 +38,12 @@ int calculate(int *g,int *p,int v,int k,int x)
 	for(i=1;i<=v;i++)
 	{
 		if(*(p+x*(v+1)+i)==1)
-			function1(g,chrom,v,k);
+			function2(g,chrom,v,k);
 		else if(*(p+x*(v+1)+i)==2)
-			function1(g,chrom,v,k);
+			function2(g,chrom,v,k);
 		else if(*(p+x*(v+1)+i)==3)
-			function1(g,chrom,v,k);
+			function3(g,chrom,v,k);
 	}
-	printf("success");
 	return(fitness(g,chrom,v,0));
 }
 void outsideFitness(int *g,int *p,int n,int v,int k)
@@ -73,13 +72,9 @@ void tournamentSelection(int *p,int v,int s,int n)
 	for(i=0;i<s;i++)
 	{
 		for(j=1;j<=n;j++)
-		{
 			record[j]=0;
-		}
 		for(j=1;j<=n;j++)//random array
-		{
 			array[j]=j;
-		}
 		for(j=1;j<=n;j++)
 		{
 			int r=rand()%n+1;
@@ -131,7 +126,7 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 int function1(int *g,int *c,int v,int k)
 {	
-	int x,y,i,j;//x: 已塗; y:未塗
+	int x=0,y=0,i,j;//x: 已塗; y:未塗
     	for (i=0; i<v; i++) {
         	if (c[i]==0)
             		y++;
@@ -185,7 +180,7 @@ int function2(int *g,int *chrom,int v,int k)
 	int max_degree=0;
 	int max_who=0;
 	int order =1;
-	int i,j;
+	int i;
 	int colored_bool = 0;
 	int colored[k] ;
 	srand(time(NULL));
@@ -195,11 +190,11 @@ int function2(int *g,int *chrom,int v,int k)
 	 	for(i=1;i<=v;i++){
 	 		if((*(g+i*(v+1)+max_who))==0)continue;
 	 		if(*(chrom+(i))!=0)
-	 			colored[*(chrom+(i))] = colored[*(chrom+(i))];
+	 			colored[*(chrom+(i))] = colored[*(chrom+(i))]+1;
 	 	}
-	 	for(i=0,j=rand()%k;i<k;i++,j++){
-	 		if(colored[j]==0){
-				*(chrom+max_who) = j;
+	 	for(i=0;i<k;i++){
+	 		if(colored[i]==0){
+				*(chrom+max_who) = i;
 				colored_bool = 1;
 				break;
 			}
@@ -211,6 +206,7 @@ int function2(int *g,int *chrom,int v,int k)
 }
 int function3(int *g,int *chrom,int v,int k)
 {
+	srand(time(NULL));
 	int i,r;
 	r=rand()%v+1;
 	while(chrom[r]!=0||r==0)
