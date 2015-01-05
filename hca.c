@@ -207,7 +207,7 @@ void function1(int *g,int *chrom,int v,int k)
             f2++;
         }
     }
-    int o[5]={-1};//not neibor and not draw
+    int o[v];//not neibor and not draw
     int r=0;
     int g1=0;//test if connect with colored node
     for (int i=0; i<y; i++) {//n
@@ -226,7 +226,7 @@ void function1(int *g,int *chrom,int v,int k)
     for (int i=0; i<r; i++) {
         t[i]=0;
         for (int j=0; j<v; j++) {
-            if (*(g+o[r]*(v+1)+1+j)==1)
+            if (*(g+o[i]*(v+1)+1+j)==1)
                 t[i]++;
         }
     }
