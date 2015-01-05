@@ -177,62 +177,56 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 void function1(int *g,int *chrom,int v,int k)
 {
-    int i,j,x=0, y=0;
-    for (i=1; i<=v; i++) 
-	{
-        if (chrom[i]==0)
-            y++;
+    int x=0, y=0;
+    for (int i=0; i<v; i++) {
+        if (chrom[i+1]==0)
+            y++;//not draw
         else
             x++;
     }
-    int* m = (int*)malloc(sizeof(int)*(x));
-    int* n = (int*)malloc(sizeof(int)*(y));
-    for (i=1; i<=v; i++)
-	{
-        if (chrom[i]==0)
-		{
-            m[y++]=i;
+    int m[x];//already draw
+    int n[y];//to draw
+    int f1=0,f2=0;
+    for (int i=1; i<v+1; i++) {
+        if (chrom[i]==1){
+            m[f1]=i;//m[0]=1
+            f1++;
         }
-        else
-		{
-            n[x++]=i;
-        }
-    }
-    int* o = (int*)malloc(sizeof(int)*(v+1));
-    int r=0;//not neibor
-    for (i=1; i<=y; i++)
-	{
-        for(j=1; j<=x; j++)
-		{
-            if (*g+(n[i]*(v+1)+m[j])==1) 
-				break;
-            else
-                if (j==x) 
-				{
-                    o[r]=i;
-					r++;
-                }
+        else{
+            n[f2]=i;//n[0,1,2,3]=2,3,4,5
+            f2++;
         }
     }
-    int* t = (int*)malloc(sizeof(int)*(r));
+    int o[5]={-1};//not neibor and not draw
+    int r=0;
+    int g1=0;//test if connect with colored node
+    for (int i=0; i<y; i++) {//n
+        //int j=0;
+        g1=0;
+        for(int j=0; j<x; j++) {//m
+            if (g[n[i]*(v+1)+m[j]]==1) g1=1;
+        }
+        if (g1==0) {
+            o[r]=n[i];
+            r++;
+        }
+    }
+    int t[r];
     int max=0, f=0;
-    for (i=0; i<r; i++)
-	{
-        for (j=1; j<=v; j++)
-		{
-            if ((*g+o[i]*(v+1)+j)==1)
+    for (int i=0; i<r; i++) {
+        t[i]=0;
+        for (int j=0; j<v; j++) {
+            if ((g[o[r]*(v+1)+1+j])==1)
                 t[i]++;
         }
     }
-    for (i=0; i<r; i++) 
-	{
-        if (t[i]>max)
-		{
+    for (int i=0; i<r; i++)
+        if (t[i]>max) {
             f=i;
             max=t[i];
         }
-    }
-    *(chrom+(f))=rand()%k+1;
+    srand(time(NULL));
+    chrom[o[f]]=rand()%k+1;
 }
 void function2(int *g,int *chrom,int v,int k)
 {
