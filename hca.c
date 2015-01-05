@@ -37,9 +37,16 @@ void flip2(int *g,int *p,int v,int n,int k)
 		for(j=1;i<=v;i++)
 		{
 			if(*(p+array[j])==1)
-				continue;
-			int r=rand()%k+1;
-			chrom[array[j]]=r;
+				chrom[j]=*(p+1*(v+1)+j);
+			else
+			{
+				int r=rand()%2;
+				if(r==0)
+				{
+					r=rand()%k+1;
+					chrom[array[j]]=r;
+				}
+			}
 		}
 		chrom[0]=fitness(g,chrom,v,0);
 		if(*(p+i*(v+1))>chrom[0])
@@ -90,16 +97,16 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	for(i=1;i<v;i++){
 		switch(*(chrom+i)){
 			case 1:
-			fprintf(ptr,"%d [style = filled, fillcolor = aquamarine];\n",i);
+			fprintf(ptr,"%d [styled = filled, fillcolor = aquamarine];\n",i);
 			break;
 			case 2:
-			fprintf(ptr,"%d [style = filled,fillcolor = yellow];\n",i);
+			fprintf(ptr,"%d [styled = filled,fillcolor = yellow];\n",i);
 			break;
 			case 3:
-			fprintf(ptr,"%d [style = filled,fillcolor = blue];\n",i);
+			fprintf(ptr,"%d [styled = filled,fillcolor = blue];\n",i);
 			break;
 			case 4:
-			fprintf(ptr,"%d [style = filled,fillcolor = green];\n",i);
+			fprintf(ptr,"%d [styled = filled,fillcolor = green];\n",i);
 			break;
 			default:
 			fprintf(ptr,"%d;\n",i);
@@ -107,7 +114,7 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	}
 		
 	for(i=1;i<=v;i++){
-		for(j=i+1;j<=v;j++){
+		for(j=i;j<=v;j++){
 			if((*g+i*(v+1)+j)==0)continue;
 			fprintf(ptr,"%d -- %d",i,j);
 			if(*(chrom+i)==*(chrom+j))
@@ -152,15 +159,15 @@ int calculate(int *g,int *p,int v,int k,int x,int *best_chrom)
 		{
 			if(*(p+x*(v+1)+i)==1)
 			{
-				function2(g,chrom,v,k);
+				function1(g,chrom,v,k);
 			}
 			else if(*(p+x*(v+1)+i)==2)
 			{
-				function2(g,chrom,v,k);
+				function1(g,chrom,v,k);
 			}
 			else if(*(p+x*(v+1)+i)==3)
 			{
-				function2(g,chrom,v,k);
+				function1(g,chrom,v,k);
 			}
 		}
 		int f=fitness(g,chrom,v,0);	
@@ -230,7 +237,7 @@ void tournamentSelection(int *p,int v,int s,int n)
             int winner=j;
             for(m=1;m<s;m++)
             {
-                if(winner>*(p+array[j+m]*(v+1)))
+                if(winnerFitness>*(p+array[j+m]*(v+1)))
                 {
                     winnerFitness=*(p+array[j+m]*(v+1));
                     winner=array[j+m];
@@ -324,7 +331,7 @@ void function2(int *g,int *chrom,int v,int k)
 }
 void function3(int *g,int *chrom,int v,int k)
 {
-//	srand(time(NULL));
+	//srand(time(NULL));
     int i,r;
     r=rand()%v+1;
     while(chrom[r]!=0||r==0)
@@ -506,9 +513,9 @@ void crossover(int *g,int *p,int v,int n)
 		
 		chrom[0][0]=fitness(g,chrom[0],v,0);
 		chrom[1][0]=fitness(g,chrom[1],v,0);
-		if(*(p+i*(v+1))>chrom[0][0]&&*(p+(i+1))>chrom[0][0])
+		if((*(p+i*(v+1))>chrom[0][0])&&(*(p+(i+1)*(v+1))>chrom[0][0]))
 		{
-			if(*(p+i*(v+1))>*(p+(i+1)))
+			if(*(p+i*(v+1))>*(p+(i+1)*(v+1)))
 			{
 				for(j=0;j<=v;j++)
 				{
@@ -523,9 +530,9 @@ void crossover(int *g,int *p,int v,int n)
 				}
 			}
 		}
-		if(*(p+i*(v+1))>chrom[1][0]&&*(p+(i+1)*(v+1))>chrom[1][0])
+		if((*(p+i*(v+1))>chrom[1][0])&&(*(p+(i+1)*(v+1))>chrom[1][0]))
 		{
-			if(*(p+i*(v+1))>*(p+(i+1)))
+			if(*(p+i*(v+1))>*(p+(i+1)*(v+1)))
 			{
 				for(j=0;j<=v;j++)
 				{
