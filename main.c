@@ -27,7 +27,7 @@ int main(int argc,char *argv[])
         init(p,g,n,v,k);
 		//init_new(g,p,n,v,k,a);
 		//printPopulation(p,n,v);
-        while(condition(p,v,n)==1)
+        do
         {
             int p1,p2,c1[v+1],c2[v+1];
             tournamentSelection(p,v,s,n);
@@ -44,7 +44,9 @@ int main(int argc,char *argv[])
 			//printPopulation(p,n,v);
 			printResult(p,v,n,generation);
 			//getchar();
-        }
+			int Best=getBestOne(p,v,n);
+			draw_graph(g,p+Best*(v+1),v,"Best.dot");
+        }while(condition(p,v,n)==1);
 		printResult(p,v,n,generation);
 		repeat--;
     }
