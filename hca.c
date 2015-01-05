@@ -10,11 +10,12 @@
 #include<time.h>
 #include<limits.h>
 #include"hca.h"
-void flip(int *g,int *p,int v,int n,int k)
+void flip2(int *g,int *p,int v,int n,int k)
 {
 	srand(time(NULL));
 	int i,j;
 	int chrom[v+1];
+	int array[v+1];
 	for(i=1;i<=n;i++)
 	{
 		int x;
@@ -22,10 +23,55 @@ void flip(int *g,int *p,int v,int n,int k)
 		{
 			chrom[x]=*(p+i*(v+1)+x);
 		}
+		for(x=0;x<=v;x++)
+		{
+			array[x]=x;
+		}
+		for(x=1;x<=v;x++)
+		{
+			int r=rand()%v+1;
+			int temp=array[x];
+			array[x]=array[r];
+			array[r]=temp;
+		}
 		for(j=1;i<=v;i++)
 		{
+			if(*(p+array[j])==1)
+				continue;
 			int r=rand()%k+1;
-			chrom[i]=r;
+			chrom[array[j]]=r;
+		}
+		chrom[0]=fitness(g,chrom,v,0);
+		if(*(p+i*(v+1))>chrom[0])
+		{
+			for(x=0;x<=v;x++)
+			{
+				*(p+i*(v+1)+x)=chrom[x];
+			}
+		}
+	}
+}
+
+void flip(int *g,int *p,int v,int n,int k)
+{
+	srand(time(NULL));
+	int i,j;
+	int chrom[v+1];
+	int array[v+1];
+	for(i=1;i<=n;i++)
+	{
+		int x;
+		for(x=0;x<=v;x++)
+		{
+			chrom[x]=*(p+i*(v+1)+x);
+		}
+		uniformArray(array,v+1);
+		for(j=1;i<=v;i++)
+		{
+			if(*(p+array[j])==1)
+				continue;
+			int r=rand()%k+1;
+			chrom[array[j]]=r;
 			if(fitness(g,p,v,i)>fitness(g,chrom,v,0))
 			{
 				for(x=0;x<=v;x++)
@@ -106,15 +152,15 @@ int calculate(int *g,int *p,int v,int k,int x,int *best_chrom)
 		{
 			if(*(p+x*(v+1)+i)==1)
 			{
-				function3(g,chrom,v,k);
+				function1(g,chrom,v,k);
 			}
 			else if(*(p+x*(v+1)+i)==2)
 			{
-				function3(g,chrom,v,k);
+				function1(g,chrom,v,k);
 			}
 			else if(*(p+x*(v+1)+i)==3)
 			{
-				function3(g,chrom,v,k);
+				function1(g,chrom,v,k);
 			}
 		}
 		int f=fitness(g,chrom,v,0);	
@@ -187,56 +233,44 @@ void tournamentSelection(int *p,int v,int s,int n)
                 if(winner>*(p+array[j+m]*(v+1)))
                 {
                     winnerFitness=*(p+array[j+m]*(v+1));
-                    winner=j+m;
+                    winner=array[j+m];
                 }
             }
             int a;
             for(a=0;a<=v;a++)
             {
-                *(pop+count*(v+1)+a)=*(p+array[winner]*(v+1)+a);
+                *(pop+count*(v+1)+a)=*(p+winner*(v+1)+a);
             }
             count++;
         }
     }
-    for(i=0;i<=n;i++)
+    for(i=1;i<=n;i++)
     {
         for(j=0;j<=v;j++)
         {
             *(p+i*(v+1)+j)=*(pop+i*(v+1)+j);
         }
     }
-    /* be comment;
-     for(i=0;i<n;i++){
-     int winner = randomarray[0][i];
-     int WinnderFitness =  *(p+winner*(v+1));
-     
-     int challenger = randomarray[1][i];
-     int ChallengerFitness = *(p+challenger*(v+1));
-     if(ChallengerFitness > WinnderFitness){
-     winner = challenger;
-     WinnderFitness = ChallengerFitness;
-     }
-     *(pool+i) = winner;
-     }
-     */
 }
 void function1(int *g,int *chrom,int v,int k)
 {
-    int max_degree=0;
+  int max_degree=0;
     int max_who=0;
     int order =1;
     int i;
     int colored_neibor = 0;
+    int colored[k] ;
     srand(time(NULL));
     int test=0;
     for(i=0;i<k;i++) colored[i]=0;
     for(order=1;order<=v;order++){
         colored_neibor = 0;
         getDegree(g,v,order,&max_who,&max_degree);
+        //printf("order=%d,max_who=%d\n",order,max_who);
         if(*(chrom+(max_who))!=0)continue;
         for(i=1;i<=v;i++){
-            if((*(g+i*(v+1)+max_who))==1){//max_who has edge with i
-                if (*(chrom+(i))!=0){//i had been colored->next order
+            if((*(g+i*(v+1)+max_who))==1){//max_who和i有edge
+                if (*(chrom+(i))!=0){//i有著色->跳下個order
                     test=1;
                     continue;
                 }
@@ -290,7 +324,7 @@ void function2(int *g,int *chrom,int v,int k)
 }
 void function3(int *g,int *chrom,int v,int k)
 {
-	srand(time(NULL));
+	//srand(time(NULL));
     int i,r;
     r=rand()%v+1;
     while(chrom[r]!=0||r==0)
@@ -440,18 +474,72 @@ void printResult(int *p,int v,int n,int gen)
     printf("\n");
 }
 
-void crossover(int *p,int v,int n)
+void crossover(int *g,int *p,int v,int n)
 {
     int i,j;
     for(i=1;i<=n;i+=2)
     {
-		int r=rand()%v+1;
-        for(j=r;j<=v;j++)
+		int chrom[2][v+1];
+		for(j=1;j<=v;j++)
+		{
+			chrom[0][j]=*(p+i*(v+1)+j);
+			chrom[1][j]=*(p+(i+1)*(v+1)+j);
+		}
+		int r=rand()%2;
+        for(j=1;j<=v;j++)
         {
-            int temp=*(p+i*(v+1)+j);
-            *(p+i*(v+1)+j)=*(p+(i+1)*(v+1)+j);
-            *(p+(i+1)*(v+1)+j)=temp;
+			int r=rand()%2;
+			if(r==1)
+			{
+            	int temp=chrom[0][j];
+            	chrom[0][j]=chrom[1][j];
+            	chrom[1][j]=temp;
+			}
         }
+		/*
+		for(j=1;j<=v;j++)
+		{
+			*(p+i*(v+1)+j)=chrom[0][j];
+			*(p+(i+1)*(v+1)+j)=chrom[1][j];
+		}
+		*/
+		
+		chrom[0][0]=fitness(g,chrom[0],v,0);
+		chrom[1][0]=fitness(g,chrom[1],v,0);
+		if(*(p+i*(v+1))>chrom[0][0]&&*(p+(i+1))>chrom[0][0])
+		{
+			if(*(p+i*(v+1))>*(p+(i+1)))
+			{
+				for(j=0;j<=v;j++)
+				{
+					*(p+i*(v+1)+j)=chrom[0][j];
+				}
+			}
+			else
+			{
+				for(j=0;j<=v;j++)
+				{
+					*(p+(i+1)*(v+1)+j)=chrom[0][j];
+				}
+			}
+		}
+		if(*(p+i*(v+1))>chrom[1][0]&&*(p+(i+1)*(v+1))>chrom[1][0])
+		{
+			if(*(p+i*(v+1))>*(p+(i+1)))
+			{
+				for(j=0;j<=v;j++)
+				{
+					*(p+i*(v+1)+j)=chrom[1][j];
+				}
+			}
+			else
+			{
+				for(j=0;j<=v;j++)
+				{
+					*(p+(i+1)*(v+1)+j)=chrom[1][j];
+				}
+			}
+		}
     }
 }
 void simpleCrossover(int *g,int *p,int p1,int p2,int *c1,int *c2,int v)
@@ -698,9 +786,9 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
     {
         *(p+i*(v+1))=fitness(g,p,v,i);
     }
-	printf("init\n");
-	printPopulation(p,n,v);
-	printf("init_fin\n");
+	//printf("init\n");
+	//printPopulation(p,n,v);
+	//printf("init_fin\n");
 }
 
 void init_new(int *g,int *p, int n,int v,int k,int a)
