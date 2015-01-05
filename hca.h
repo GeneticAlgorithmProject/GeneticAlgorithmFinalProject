@@ -14,6 +14,7 @@ void fileProcessing2(int *g,int v,char *ptr);
 void init(int *p,int *g,int n,int v,int k);
 void init_new(int *g,int *p, int n,int v,int k,int a);
 //small
+void flip(int *g,int *p,int v,int n,int k);
 void test(int i);
 int compare(const void *a,const void *b);
 void setDegree(int *g,int v);
