@@ -10,6 +10,32 @@
 #include<time.h>
 #include<limits.h>
 #include"hca.h"
+void flip(int *g,int *p,int v,int n,int k)
+{
+	srand(time(NULL));
+	int i,j;
+	int chrom[v+1];
+	for(i=1;i<=n;i++)
+	{
+		int x;
+		for(x=0;x<=v;x++)
+		{
+			chrom[x]=*(p+i*(v+1)+x);
+		}
+		for(j=1;i<=v;i++)
+		{
+			int r=rand()%k+1;
+			chrom[i]=r;
+			if(fitness(g,p,v,i)>fitness(g,chrom,v,0))
+			{
+				for(x=0;x<=v;x++)
+				{
+					*(p+i*(v+1)+x)=chrom[x];
+				}
+			}
+		}
+	}
+}
 void draw_graph(int *g,int *chrom,int v,char* filename){
 	
 	int i,j;
@@ -95,7 +121,10 @@ int calculate(int *g,int *p,int v,int k,int x,int *best_chrom)
 		if(f<best)
 		{
 			best=f;
-			strcpy((char*)best_chrom,(char*)chrom);
+			for(x=0;x<=v;x++)
+			{
+				best_chrom[x]=chrom[x];
+			}
 		}
 		sum=sum+f;
 	}
@@ -109,6 +138,12 @@ void outsideFitness(int *g,int *p,int n,int v,int k)
     {
         *(p+i*(v+1))=calculate(g,p,v,k,i,best_chrom);
     }
+	printf("Best chrom\n");
+	for(i=1;i<=v;i++)
+	{
+		printf("%d ",best_chrom[i]);
+	}
+	printf("\n");
 	draw_graph(g,best_chrom,v,"best.dot");
 }
 void tournamentSelection(int *p,int v,int s,int n)
@@ -187,9 +222,9 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 void function1(int *g,int *chrom,int v,int k)
 {
-        srand(time(NULL));
-    int x=0, y=0;
-    for (int i=0; i<v; i++) {
+        int x=0, y=0;
+	int i,j;
+    for ( i=0; i<v; i++) {
         if (*(chrom+i+1)==0)
             y++;//not draw
         else
@@ -198,7 +233,7 @@ void function1(int *g,int *chrom,int v,int k)
     int m[x];//already draw
     int n[y];//to draw
     int f1=0,f2=0;
-    for (int i=1; i<v+1; i++) {
+    for ( i=1; i<v+1; i++) {
         if (*(chrom+i)==1){
             m[f1]=i;//m[0]=1
             f1++;
@@ -211,41 +246,33 @@ void function1(int *g,int *chrom,int v,int k)
     int o[v];//not neibor and not draw
     int r=0;
     int g1=0;//test if connect with colored node
-    for (int i=0; i<y; i++) {//n
+    for ( i=0; i<y; i++) {//n
         //int j=0;
         g1=0;
-        for(int j=0; j<x; j++) {//m
+        for( j=0; j<x; j++) {//m
             if (*(g+n[i]*(v+1)+m[j])==1) g1=1;
         }
         if (g1==0) {
-            o[r]=n[i];
+            o[i]=n[i];
             r++;
         }
     }
-    if (r==0) {
-        *(chrom+n[0])=rand()%k+1;
-    }
-    else {
-        printf("HERE");
-        int t[r];
-        int max=0, f=0;
-        for (int i=0; i<r; i++) {
-            t[i]=0;
-            for (int j=0; j<v; j++) {
-                if (*(g+o[i]*(v+1)+1+j)==1)
-                    t[i]++;
-            }
+    int t[r];
+    int max=0, f=0;
+    for ( i=0; i<r; i++) {
+        t[i]=0;
+        for ( j=0; j<v; j++) {
+            if (*(g+o[i]*(v+1)+1+j)==1)
+                t[i]++;
         }
-        for (int i=0; i<r; i++)
-            if (t[i]>max) {
-                f=i;
-                max=t[i];
-            }
-        
-        *(chrom+o[f])=rand()%k+1;
     }
-    
-  
+    for ( i=0; i<r; i++)
+        if (t[i]>max) {
+            f=i;
+            max=t[i];
+        }
+    srand(time(NULL));
+    *(chrom+o[f])=rand()%k+1;
 }
 void function2(int *g,int *chrom,int v,int k)
 {
@@ -283,6 +310,7 @@ void function2(int *g,int *chrom,int v,int k)
 }
 void function3(int *g,int *chrom,int v,int k)
 {
+	srand(time(NULL));
     int i,r;
     r=rand()%v+1;
     while(chrom[r]!=0||r==0)
@@ -670,14 +698,6 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
             }
             colored[max_who]=1;
         }
-        printPopulation(p,n,v);
-        /*
-         for(j=1;j<=init_count;j++)
-         {
-         printf("%d ",init_index[j]);
-         }
-         printf("\n");
-         */
     }
     for(i=1;i<=v;i++)
     {
@@ -698,7 +718,9 @@ void init(int *p,int *g,int n,int v,int k)//do greedy search
     {
         *(p+i*(v+1))=fitness(g,p,v,i);
     }
-    //printPopulation(p,n,v);
+	printf("init\n");
+	printPopulation(p,n,v);
+	printf("init_fin\n");
 }
 
 void init_new(int *g,int *p, int n,int v,int k,int a)
