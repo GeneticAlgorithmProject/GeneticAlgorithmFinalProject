@@ -187,7 +187,8 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 void function1(int *g,int *chrom,int v,int k)
 {
-        int x=0, y=0;
+    srand(time(NULL));
+    int x=0, y=0;
     for (int i=0; i<v; i++) {
         if (*(chrom+i+1)==0)
             y++;//not draw
@@ -221,22 +222,28 @@ void function1(int *g,int *chrom,int v,int k)
             r++;
         }
     }
-    int t[r];
-    int max=0, f=0;
-    for (int i=0; i<r; i++) {
-        t[i]=0;
-        for (int j=0; j<v; j++) {
-            if (*(g+o[i]*(v+1)+1+j)==1)
-                t[i]++;
-        }
+    if (r==0) {
+        chrom[n[0]]=rand()%k+1;
     }
-    for (int i=0; i<r; i++)
-        if (t[i]>max) {
-            f=i;
-            max=t[i];
+    else {
+        printf("HERE");
+        int t[r];
+        int max=0, f=0;
+        for (int i=0; i<r; i++) {
+            t[i]=0;
+            for (int j=0; j<v; j++) {
+                if (*(g+o[i]*(v+1)+1+j)==1)
+                    t[i]++;
+            }
         }
-    srand(time(NULL));
-    *(chrom+o[f])=rand()%k+1;
+        for (int i=0; i<r; i++)
+            if (t[i]>max) {
+                f=i;
+                max=t[i];
+            }
+        
+        *(chrom+o[f])=rand()%k+1;
+    }
 }
 void function2(int *g,int *chrom,int v,int k)
 {
