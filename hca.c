@@ -222,24 +222,36 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 void function1(int *g,int *chrom,int v,int k)
 {
-        int max_degree=0;
+    int max_degree=0;
     int max_who=0;
     int order =1;
     int i;
-    int colored[k] ;
+    int colored_neibor = 0;
     srand(time(NULL));
+    int test=0;
+    for(i=0;i<k;i++) colored[i]=0;
     for(order=1;order<=v;order++){
+        colored_neibor = 0;
         getDegree(g,v,order,&max_who,&max_degree);
-        if(*(chrom+(max_who-1))!=0)continue;
-        for(i=1;i<v;i++){
-            if((*g+(i*(v+1)+max_degree))==0)continue;
-            if(*(chrom+(i-1))!=0)
-                colored[*(chrom+(i-1))] = colored[*(chrom+(i-1))];
+        if(*(chrom+(max_who))!=0)continue;
+        for(i=1;i<=v;i++){
+            if((*(g+i*(v+1)+max_who))==1){//max_who has edge with i
+                if (*(chrom+(i))!=0){//i had been colored->next order
+                    test=1;
+                    continue;
+                }
+            }
+            colored_neibor++;
         }
-        for(i=0;i<k;i++)
-            if(colored[i]==0)*(chrom+max_who-1) = 1;
-        if(i==k)
-            *(chrom+max_who-1) = (rand()%k)+1;
+        if (test==1) {
+            continue;
+        }
+        if (colored_neibor==v) {
+            *(chrom+max_who) = (rand()%k)+1;
+            break;
+        }
+        if(i==v)
+            function2(g,chrom,v,k);
     }
 }
 void function2(int *g,int *chrom,int v,int k)
