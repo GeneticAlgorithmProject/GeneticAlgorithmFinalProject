@@ -89,8 +89,8 @@ void flip(int *g,int *p,int v,int n,int k)
 		}
 	}
 }
-void draw_graph(int *g,int *chrom,int v,char* filename){
-	
+void draw_graph(int *g,int *chrom,int v,char* filename)
+{	
 	int i,j;
 	FILE* ptr = fopen(filename,"w");
 	fprintf(ptr,"graph demo{\n");
@@ -113,9 +113,12 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 		}
 	}
 		
-	for(i=1;i<=v;i++){
-		for(j=i+1;j<=v;j++){
-			if((*g+i*(v+1)+j)==0)continue;
+	for(i=1;i<=v;i++)
+	{
+		for(j=i+1;j<=v;j++)
+		{
+			if(*(g+i*(v+1)+j)==0)
+				continue;
 			fprintf(ptr,"%d -- %d",i,j);
 			if(*(chrom+i)==*(chrom+j))
 				fprintf(ptr,"[color = red, penwidth = 2];\n");
