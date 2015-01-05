@@ -135,7 +135,7 @@ int fitness(int *g,int *p,int v,int x)
     int f=0;
     for(i=1;i<=v;i++)
     {
-        for(j=1;j<=v;j++)
+        for(j=i+1;j<=v;j++)
         {
             if(i==j)continue;
             if((*(g+i*(v+1)+j)==1)&&(*(p+x*(v+1)+i)==*(p+x*(v+1)+j)))
