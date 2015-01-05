@@ -45,7 +45,6 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	}
 	fprintf(ptr,"}\n");
 	fclose(ptr);
-}
 int fitness(int *g,int *p,int v,int x)
 {
     int i,j;
