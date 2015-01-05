@@ -36,6 +36,7 @@ int main(int argc,char *argv[])
             tournamentSelection(p,v,s,n);
             //randomSelectParents(n,&p1,&p2);
 			crossover(p,v,n);
+			//flip(g,p,v,n,k);
 			outsideFitness(g,p,n,v,k);
             //simpleCrossover(g,p,p1,p2,c1,c2,v);
             //localSearch(g,p,v,c1,lsl,k);
@@ -45,10 +46,7 @@ int main(int argc,char *argv[])
 			printPopulation(p,n,v);
 			printResult(p,v,n,generation);
 			getchar();
-			int best=getBestOne(p,v,n);
-			draw_graph(g,(p+best*(v+1)),v,"best.dot");
         }
-		//printResult(p,v,n,generation);
 		repeat--;
     }
     return(0);
