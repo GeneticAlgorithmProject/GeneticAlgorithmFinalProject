@@ -42,7 +42,7 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	FILE* ptr = fopen(filename,"w");
 	fprintf(ptr,"graph demo{\n");
 	for(i=1;i<v;i++){
-		switch(*(chrom+v)){
+		switch(*(chrom+i)){
 			case 1:
 			fprintf(ptr,"%d [styled = filled, fillcolor = aquamarine];\n",i);
 			break;
@@ -241,6 +241,40 @@ void function1(int *g,int *chrom,int v,int k)
         if(i==k)
             *(chrom+max_who-1) = (rand()%k)+1;
     }
+}
+void function2(int *g,int *chrom,int v,int k)
+{
+	//printf("this is function2\n");
+	int max_degree=0;
+	int max_who=0;
+	int order =1;
+	int i;
+	int colored_bool = 0;
+	int colored[k] ;
+	srand(time(NULL));
+	for(i=0;i<k;i++)colored[i]=0;
+	for(order=1;order<=v;order++){
+	 	getDegree(g,v,order,&max_who,&max_degree);
+		//printf("order=%d,max_who=%d\n",order,max_who);
+	 	if(*(chrom+(max_who))!=0)continue;
+	 	for(i=1;i<=v;i++){
+	 		if((*(g+i*(v+1)+max_who))==0)continue;
+	 		if(*(chrom+(i))!=0)
+	 			colored[*(chrom+(i))] = colored[*(chrom+(i))]+1;
+	 	}
+		//printf("no continue\n");for(i=0;i<k;i++)printf("color[%d]=is %d\n",i+1,colored[i]);
+	 	for(i=0;i<k;i++){
+	 		if(colored[i]==0){
+				*(chrom+max_who) = i+1;
+				colored_bool = 1;
+				//printf("color=%d\n",i);
+				break;
+			}
+		}
+		if(colored_bool ==1)break;
+	 	if(i==k)
+			*(chrom+max_who) = (rand()%k)+1;
+ 	}
 }
 void function3(int *g,int *chrom,int v,int k)
 {
