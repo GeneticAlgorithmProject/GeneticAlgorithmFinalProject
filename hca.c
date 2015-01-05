@@ -222,91 +222,25 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 void function1(int *g,int *chrom,int v,int k)
 {
-        int x=0, y=0;
-	int i,j;
-    for ( i=0; i<v; i++) {
-        if (*(chrom+i+1)==0)
-            y++;//not draw
-        else
-            x++;
-    }
-    int m[x];//already draw
-    int n[y];//to draw
-    int f1=0,f2=0;
-    for ( i=1; i<v+1; i++) {
-        if (*(chrom+i)==1){
-            m[f1]=i;//m[0]=1
-            f1++;
-        }
-        else{
-            n[f2]=i;//n[0,1,2,3]=2,3,4,5
-            f2++;
-        }
-    }
-    int o[v];//not neibor and not draw
-    int r=0;
-    int g1=0;//test if connect with colored node
-    for ( i=0; i<y; i++) {//n
-        //int j=0;
-        g1=0;
-        for( j=0; j<x; j++) {//m
-            if (*(g+n[i]*(v+1)+m[j])==1) g1=1;
-        }
-        if (g1==0) {
-            o[i]=n[i];
-            r++;
-        }
-    }
-    int t[r];
-    int max=0, f=0;
-    for ( i=0; i<r; i++) {
-        t[i]=0;
-        for ( j=0; j<v; j++) {
-            if (*(g+o[i]*(v+1)+1+j)==1)
-                t[i]++;
-        }
-    }
-    for ( i=0; i<r; i++)
-        if (t[i]>max) {
-            f=i;
-            max=t[i];
-        }
+        int max_degree=0;
+    int max_who=0;
+    int order =1;
+    int i;
+    int colored[k] ;
     srand(time(NULL));
-    *(chrom+o[f])=rand()%k+1;
-}
-void function2(int *g,int *chrom,int v,int k)
-{
-	//printf("this is function2\n");
-	int max_degree=0;
-	int max_who=0;
-	int order =1;
-	int i;
-	int colored_bool = 0;
-	int colored[k] ;
-	srand(time(NULL));
-	for(i=0;i<k;i++)colored[i]=0;
-	for(order=1;order<=v;order++){
-	 	getDegree(g,v,order,&max_who,&max_degree);
-		//printf("order=%d,max_who=%d\n",order,max_who);
-	 	if(*(chrom+(max_who))!=0)continue;
-	 	for(i=1;i<=v;i++){
-	 		if((*(g+i*(v+1)+max_who))==0)continue;
-	 		if(*(chrom+(i))!=0)
-	 			colored[*(chrom+(i))] = colored[*(chrom+(i))]+1;
-	 	}
-		//printf("no continue\n");for(i=0;i<k;i++)printf("color[%d]=is %d\n",i+1,colored[i]);
-	 	for(i=0;i<k;i++){
-	 		if(colored[i]==0){
-				*(chrom+max_who) = i+1;
-				colored_bool = 1;
-				//printf("color=%d\n",i);
-				break;
-			}
-		}
-		if(colored_bool ==1)break;
-	 	if(i==k)
-			*(chrom+max_who) = (rand()%k)+1;
- 	}
+    for(order=1;order<=v;order++){
+        getDegree(g,v,order,&max_who,&max_degree);
+        if(*(chrom+(max_who-1))!=0)continue;
+        for(i=1;i<v;i++){
+            if((*g+(i*(v+1)+max_degree))==0)continue;
+            if(*(chrom+(i-1))!=0)
+                colored[*(chrom+(i-1))] = colored[*(chrom+(i-1))];
+        }
+        for(i=0;i<k;i++)
+            if(colored[i]==0)*(chrom+max_who-1) = 1;
+        if(i==k)
+            *(chrom+max_who-1) = (rand()%k)+1;
+    }
 }
 void function3(int *g,int *chrom,int v,int k)
 {
