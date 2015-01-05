@@ -141,7 +141,6 @@ int fitness(int *g,int *p,int v,int x)
             if((*(g+i*(v+1)+j)==1)&&(*(p+x*(v+1)+i)==*(p+x*(v+1)+j)))
             {
                 f++;
-                break;
             }
         }
     }
