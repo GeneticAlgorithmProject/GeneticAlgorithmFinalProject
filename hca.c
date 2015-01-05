@@ -97,7 +97,7 @@ void draw_graph(int *g,int *chrom,int v,char* filename)
 	for(i=1;i<=v;i++){
 		switch(*(chrom+i)){
 			case 1:
-			fprintf(ptr,"%d [style = filled, fillcolor = aquamarine];\n",i);
+			fprintf(ptr,"%d [style = filled, fillcolor = orange];\n",i);
 			break;
 			case 2:
 			fprintf(ptr,"%d [style = filled,fillcolor = yellow];\n",i);
@@ -121,7 +121,7 @@ void draw_graph(int *g,int *chrom,int v,char* filename)
 				continue;
 			fprintf(ptr,"%d -- %d",i,j);
 			if(*(chrom+i)==*(chrom+j))
-				fprintf(ptr,"[color = red, penwidth = 2];\n");
+				fprintf(ptr,"[color = red, penwidth = 4];\n");
 			else
 				fprintf(ptr,";\n");
 		}
