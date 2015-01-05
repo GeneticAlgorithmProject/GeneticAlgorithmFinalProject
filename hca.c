@@ -15,7 +15,7 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	FILE* ptr = fopen(filename,"w");
 	fprintf(ptr,"graph demo{\n");
 	for(i=1;i<v;i++){
-		switch(){
+		switch(*(chrom+v)){
 			case 1:
 			fprintf(ptr,"%d [styled = filled, fillcolor = aquamarine];\n",i);
 			break;
