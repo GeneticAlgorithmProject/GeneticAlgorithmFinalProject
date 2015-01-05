@@ -26,6 +26,7 @@ int main(int argc,char *argv[])
     {
 		int generation=0;
         //init(p,g,n,v,k);
+	
 		init_new(g,p,n,v,k,a);
 		//printPopulation(p,n,v);
 		//getchar();
@@ -44,9 +45,11 @@ int main(int argc,char *argv[])
 			printPopulation(p,n,v);
 			printResult(p,v,n,generation);
 			getchar();
+			int best=getBestOne(p,v,n);
+			draw_graph(g,(p+best*(v+1)),v,"best.dot");
         }
 		//printResult(p,v,n,generation);
 		repeat--;
     }
     return(0);
-	}
+}
