@@ -217,7 +217,7 @@ void function1(int *g,int *chrom,int v,int k)
             if (*(g+n[i]*(v+1)+m[j])==1) g1=1;
         }
         if (g1==0) {
-            o[i]=n[i];
+            o[r]=n[i];
             r++;
         }
     }
