@@ -270,7 +270,6 @@ void function2(int *g,int *chrom,int v,int k)
 }
 void function3(int *g,int *chrom,int v,int k)
 {
-    srand(time(NULL));
     int i,r;
     r=rand()%v+1;
     while(chrom[r]!=0||r==0)
