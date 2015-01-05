@@ -90,16 +90,16 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	for(i=1;i<v;i++){
 		switch(*(chrom+i)){
 			case 1:
-			fprintf(ptr,"%d [styled = filled, fillcolor = aquamarine];\n",i);
+			fprintf(ptr,"%d [style = filled, fillcolor = aquamarine];\n",i);
 			break;
 			case 2:
-			fprintf(ptr,"%d [styled = filled,fillcolor = yellow];\n",i);
+			fprintf(ptr,"%d [style = filled,fillcolor = yellow];\n",i);
 			break;
 			case 3:
-			fprintf(ptr,"%d [styled = filled,fillcolor = blue];\n",i);
+			fprintf(ptr,"%d [style = filled,fillcolor = blue];\n",i);
 			break;
 			case 4:
-			fprintf(ptr,"%d [styled = filled,fillcolor = green];\n",i);
+			fprintf(ptr,"%d [style = filled,fillcolor = green];\n",i);
 			break;
 			default:
 			fprintf(ptr,"%d;\n",i);
@@ -107,7 +107,7 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	}
 		
 	for(i=1;i<=v;i++){
-		for(j=i;j<=v;j++){
+		for(j=i+1;j<=v;j++){
 			if((*g+i*(v+1)+j)==0)continue;
 			fprintf(ptr,"%d -- %d",i,j);
 			if(*(chrom+i)==*(chrom+j))
@@ -152,15 +152,15 @@ int calculate(int *g,int *p,int v,int k,int x,int *best_chrom)
 		{
 			if(*(p+x*(v+1)+i)==1)
 			{
-				function1(g,chrom,v,k);
+				function3(g,chrom,v,k);
 			}
 			else if(*(p+x*(v+1)+i)==2)
 			{
-				function1(g,chrom,v,k);
+				function3(g,chrom,v,k);
 			}
 			else if(*(p+x*(v+1)+i)==3)
 			{
-				function1(g,chrom,v,k);
+				function3(g,chrom,v,k);
 			}
 		}
 		int f=fitness(g,chrom,v,0);	
@@ -306,14 +306,14 @@ void function2(int *g,int *chrom,int v,int k)
 	 	for(i=1;i<=v;i++){
 	 		if((*(g+i*(v+1)+max_who))==0)continue;
 	 		if(*(chrom+(i))!=0)
-	 			colored[*(chrom+(i))] = colored[*(chrom+(i))]+1;
+	 			colored[*(chrom+(i))-1] = colored[*(chrom+(i))-1]+1;
 	 	}
 		//printf("no continue\n");for(i=0;i<k;i++)printf("color[%d]=is %d\n",i+1,colored[i]);
 	 	for(i=0;i<k;i++){
 	 		if(colored[i]==0){
 				*(chrom+max_who) = i+1;
 				colored_bool = 1;
-				//printf("color=%d\n",i);
+				printf("color=%d\n",i);
 				break;
 			}
 		}
@@ -324,7 +324,7 @@ void function2(int *g,int *chrom,int v,int k)
 }
 void function3(int *g,int *chrom,int v,int k)
 {
-	//srand(time(NULL));
+//	srand(time(NULL));
     int i,r;
     r=rand()%v+1;
     while(chrom[r]!=0||r==0)

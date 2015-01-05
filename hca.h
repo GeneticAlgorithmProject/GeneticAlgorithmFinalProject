@@ -1,5 +1,5 @@
 //main
-void crossover(int *p,int v,int n);
+void crossover(int *g,int *p,int v,int n);
 void tournamentSelection(int *p,int v,int s,int n);
 int calculate(int *g,int *p,int v,int k,int x,int *best_chrom);
 void outsideFitness(int *g,int *p,int n,int v,int k);
