@@ -94,19 +94,19 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	int i,j;
 	FILE* ptr = fopen(filename,"w");
 	fprintf(ptr,"graph demo{\n");
-	for(i=1;i<v;i++){
+	for(i=1;i<=v;i++){
 		switch(*(chrom+i)){
 			case 1:
-			fprintf(ptr,"%d [styled = filled, fillcolor = aquamarine];\n",i);
+			fprintf(ptr,"%d [style = filled, fillcolor = aquamarine];\n",i);
 			break;
 			case 2:
-			fprintf(ptr,"%d [styled = filled,fillcolor = yellow];\n",i);
+			fprintf(ptr,"%d [style = filled,fillcolor = yellow];\n",i);
 			break;
 			case 3:
-			fprintf(ptr,"%d [styled = filled,fillcolor = blue];\n",i);
+			fprintf(ptr,"%d [style = filled,fillcolor = blue];\n",i);
 			break;
 			case 4:
-			fprintf(ptr,"%d [styled = filled,fillcolor = green];\n",i);
+			fprintf(ptr,"%d [style = filled,fillcolor = green];\n",i);
 			break;
 			default:
 			fprintf(ptr,"%d;\n",i);
@@ -114,7 +114,7 @@ void draw_graph(int *g,int *chrom,int v,char* filename){
 	}
 		
 	for(i=1;i<=v;i++){
-		for(j=i;j<=v;j++){
+		for(j=i+1;j<=v;j++){
 			if((*g+i*(v+1)+j)==0)continue;
 			fprintf(ptr,"%d -- %d",i,j);
 			if(*(chrom+i)==*(chrom+j))
@@ -291,7 +291,7 @@ void function1(int *g,int *chrom,int v,int k)
             *(chrom+max_who) = (rand()%k)+1;
             break;
         }
-        if(i==v)
+        if(order==v)
             function2(g,chrom,v,k);
     }
 }
