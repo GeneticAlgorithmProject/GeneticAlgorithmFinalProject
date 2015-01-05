@@ -11,7 +11,7 @@
 #include"hca.h"
 void draw_graph(int *g,int *chrom,int v,char* filename){
 	
-	int i;
+	int i,j;
 	FILE* ptr = fopen(filename,"w");
 	fprintf(ptr,"graph demo{\n");
 	for(i=1;i<v;i++){
@@ -66,22 +66,28 @@ int fitness(int *g,int *p,int v,int x)
 }
 int calculate(int *g,int *p,int v,int k,int x)
 {
-	int i,j,sum=0;
+	int i,j,l,sum=0;
 	int chrom[v+1];
-	for(i=0;i<=v;i++)
-	{
-		chrom[i]=0;
-	}
 	for(l=0;l<10;l++)
 	{
+		for(i=0;i<=v;i++)
+		{
+			chrom[i]=0;
+		}
 		for(i=1;i<=v;i++)
 		{
 			if(*(p+x*(v+1)+i)==1)
-				function2(g,chrom,v,k);
-			else if(*(p+x*(v+1)+i)==2)
-				function2(g,chrom,v,k);
-			else if(*(p+x*(v+1)+i)==3)
+			{
 				function3(g,chrom,v,k);
+			}
+			else if(*(p+x*(v+1)+i)==2)
+			{
+				function3(g,chrom,v,k);
+			}
+			else if(*(p+x*(v+1)+i)==3)
+			{
+				function3(g,chrom,v,k);
+			}
 		}
 		sum=sum+fitness(g,chrom,v,0);
 	}
@@ -419,15 +425,12 @@ void crossover(int *p,int v,int n)
     int i,j;
     for(i=1;i<=n;i+=2)
     {
-        for(j=1;j<=v;j++)
+		int r=rand()%v+1;
+        for(j=r;j<=v;j++)
         {
-            int r=rand()%2;
-            if(r==1)
-            {
-                int temp=*(p+i*(v+1)+j);
-                *(p+i*(v+1)+j)=*(p+(i+1)*(v+1)+j);
-                *(p+(i+1)*(v+1)+j)=temp;
-            }
+            int temp=*(p+i*(v+1)+j);
+            *(p+i*(v+1)+j)=*(p+(i+1)*(v+1)+j);
+            *(p+(i+1)*(v+1)+j)=temp;
         }
     }
 }
@@ -476,9 +479,6 @@ void uniformArray(int *array,int n)
     }
     free(base);
 }
-
-
-
 int condition(int *p,int v,int n)
 {
     int i;
@@ -493,7 +493,6 @@ int condition(int *p,int v,int n)
 }
 int fileProcessing1(char *ptr)//get v
 {
-	printf("file start\n");
     FILE *fp;
     int v=0;
     char temp[100];
@@ -522,8 +521,7 @@ int fileProcessing1(char *ptr)//get v
             }
         }
     }
-	printf("return\n");
-    return v;
+    return(v);
 }
 void setDegree(int *g,int v)
 {
@@ -711,4 +709,8 @@ void init_new(int *g,int *p, int n,int v,int k,int a)
         }
     }
     outsideFitness(g,p,n,v,k);
+}
+void test(int i)
+{
+	printf("test%d\n",i);
 }
