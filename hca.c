@@ -8,6 +8,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<time.h>
+#include<limits.h>
 #include"hca.h"
 void draw_graph(int *g,int *chrom,int v,char* filename){
 	
@@ -64,10 +65,11 @@ int fitness(int *g,int *p,int v,int x)
     }
     return(f);
 }
-int calculate(int *g,int *p,int v,int k,int x)
+int calculate(int *g,int *p,int v,int k,int x,int *best_chrom)
 {
 	int i,j,l,sum=0;
 	int chrom[v+1];
+	int best=INT_MAX;
 	for(l=0;l<10;l++)
 	{
 		for(i=0;i<=v;i++)
@@ -89,17 +91,25 @@ int calculate(int *g,int *p,int v,int k,int x)
 				function3(g,chrom,v,k);
 			}
 		}
-		sum=sum+fitness(g,chrom,v,0);
+		int f=fitness(g,chrom,v,0);	
+		if(f<best)
+		{
+			best=f;
+			strcpy((char*)best_chrom,(char*)chrom);
+		}
+		sum=sum+f;
 	}
 	return((sum/10));
 }
 void outsideFitness(int *g,int *p,int n,int v,int k)
 {
     int i;
+	int best_chrom[v+1];
     for(i=1;i<=n;i++)
     {
-        *(p+i*(v+1))=calculate(g,p,v,k,i);
+        *(p+i*(v+1))=calculate(g,p,v,k,i,best_chrom);
     }
+	draw_graph(g,best_chrom,v,"best.dot");
 }
 void tournamentSelection(int *p,int v,int s,int n)
 {
@@ -177,56 +187,62 @@ void tournamentSelection(int *p,int v,int s,int n)
 }
 void function1(int *g,int *chrom,int v,int k)
 {
-    int x=0, y=0;
-    for (int i=0; i<v; i++) {
-        if (chrom[i+1]==0)
-            y++;//not draw
+    int i,j,x=0, y=0;
+    for (i=1; i<=v; i++) 
+	{
+        if (chrom[i]==0)
+            y++;
         else
             x++;
     }
-    int m[x];//already draw
-    int n[y];//to draw
-    int f1=0,f2=0;
-    for (int i=1; i<v+1; i++) {
-        if (chrom[i]==1){
-            m[f1]=i;//m[0]=1
-            f1++;
+    int* m = (int*)malloc(sizeof(int)*(x));
+    int* n = (int*)malloc(sizeof(int)*(y));
+    for (i=1; i<=v; i++)
+	{
+        if (chrom[i]==0)
+		{
+            m[y++]=i;
         }
-        else{
-            n[f2]=i;//n[0,1,2,3]=2,3,4,5
-            f2++;
-        }
-    }
-    int o[5]={-1};//not neibor and not draw
-    int r=0;
-    int g1=0;//test if connect with colored node
-    for (int i=0; i<y; i++) {//n
-        //int j=0;
-        g1=0;
-        for(int j=0; j<x; j++) {//m
-            if (g[n[i]*(v+1)+m[j]]==1) g1=1;
-        }
-        if (g1==0) {
-            o[r]=n[i];
-            r++;
+        else
+		{
+            n[x++]=i;
         }
     }
-    int t[r];
+    int* o = (int*)malloc(sizeof(int)*(v+1));
+    int r=0;//not neibor
+    for (i=1; i<=y; i++)
+	{
+        for(j=1; j<=x; j++)
+		{
+            if (*g+(n[i]*(v+1)+m[j])==1) 
+				break;
+            else
+                if (j==x) 
+				{
+                    o[r]=i;
+					r++;
+                }
+        }
+    }
+    int* t = (int*)malloc(sizeof(int)*(r));
     int max=0, f=0;
-    for (int i=0; i<r; i++) {
-        t[i]=0;
-        for (int j=0; j<v; j++) {
-            if ((g[o[r]*(v+1)+1+j])==1)
+    for (i=0; i<r; i++)
+	{
+        for (j=1; j<=v; j++)
+		{
+            if ((*g+o[i]*(v+1)+j)==1)
                 t[i]++;
         }
     }
-    for (int i=0; i<r; i++)
-        if (t[i]>max) {
+    for (i=0; i<r; i++) 
+	{
+        if (t[i]>max)
+		{
             f=i;
             max=t[i];
         }
-    srand(time(NULL));
-    chrom[o[f]]=rand()%k+1;
+    }
+    *(chrom+(f))=rand()%k+1;
 }
 void function2(int *g,int *chrom,int v,int k)
 {
