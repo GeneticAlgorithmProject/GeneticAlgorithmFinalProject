@@ -152,15 +152,15 @@ int calculate(int *g,int *p,int v,int k,int x,int *best_chrom)
 		{
 			if(*(p+x*(v+1)+i)==1)
 			{
-				function3(g,chrom,v,k);
+				function2(g,chrom,v,k);
 			}
 			else if(*(p+x*(v+1)+i)==2)
 			{
-				function3(g,chrom,v,k);
+				function2(g,chrom,v,k);
 			}
 			else if(*(p+x*(v+1)+i)==3)
 			{
-				function3(g,chrom,v,k);
+				function2(g,chrom,v,k);
 			}
 		}
 		int f=fitness(g,chrom,v,0);	
@@ -313,7 +313,7 @@ void function2(int *g,int *chrom,int v,int k)
 	 		if(colored[i]==0){
 				*(chrom+max_who) = i+1;
 				colored_bool = 1;
-				printf("color=%d\n",i);
+			//	printf("color=%d\n",i);
 				break;
 			}
 		}
